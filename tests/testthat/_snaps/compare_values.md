@@ -120,3 +120,11 @@
       Error in `df_compare()`:
       ! `relative_delta` must be a single number between 0 and 1, not -0.1.
 
+# ignore_trailing_blanks must be TRUE or FALSE [data_frame]
+
+    Code
+      df_compare(as_backend(df), as_backend(df), id = "id", ignore_trailing_blanks = NA)
+    Condition
+      Error in `df_compare()`:
+      ! `ignore_trailing_blanks` must be `TRUE` or `FALSE`, not `NA`.
+

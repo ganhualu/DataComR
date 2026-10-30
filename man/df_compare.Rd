@@ -4,7 +4,15 @@
 \alias{df_compare}
 \title{Compare two datasets the way PROC COMPARE does}
 \usage{
-df_compare(base, compare, id)
+df_compare(
+  base,
+  compare,
+  id,
+  method = "exact",
+  criterion = 1e-05,
+  relative_delta = 0,
+  ignore_trailing_blanks = TRUE
+)
 }
 \arguments{
 \item{base}{The Base dataset: the reference the comparison reports against.}
@@ -12,10 +20,35 @@ df_compare(base, compare, id)
 \item{compare}{The Compare dataset, checked against \code{base}.}
 
 \item{id}{Character vector of ID variables used to pair observations.}
+
+\item{method}{The Comparison method for numeric variables: \code{"exact"},
+\code{"absolute"}, \code{"relative"} or \code{"percent"}, as SAS's \verb{METHOD=}.}
+
+\item{criterion}{The Criterion the method tests differences against, as
+SAS's \verb{CRITERION=}.}
+
+\item{relative_delta}{The constant δ that \code{method = "relative"} adds to the
+denominator, as in SAS's \code{METHOD=RELATIVE(δ)}: a number between 0 and 1,
+0 by default as in SAS.}
+
+\item{ignore_trailing_blanks}{If \code{TRUE} (the default), character values
+that differ only in trailing blanks are equal, as in SAS. Leading blanks
+always count.}
 }
 \value{
 A \code{df_compare} object.
 }
 \description{
-Compare two datasets the way PROC COMPARE does
+Each common variable belongs to a Type family: numeric (integer, double,
+logical), character (character, factor compared by labels), date or
+datetime (compared as instants, whatever the time zone). Variables of
+different families are Conflicting types and their values are not
+compared. The Comparison method and Criterion apply to the numeric family
+only; other families are compared exactly.
+}
+\details{
+Two missing values are equal and \code{NaN} counts as missing. Special missings
+(haven's tagged NAs, SAS's \code{.A} to \code{.Z}) are equal only with the same
+letter; this rule needs in-memory data frames, since arrow and duckdb do
+not keep the tags.
 }

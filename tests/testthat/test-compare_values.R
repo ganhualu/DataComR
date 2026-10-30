@@ -254,6 +254,32 @@ test_that("special missings are equal only when they carry the same letter", {
   )
 })
 
+test_each_backend("trailing blanks are ignored by default; leading blanks always count", {
+  base <- data.frame(id = 1:4, s = c("abc", "abc  ", " abc", "abc"))
+  compare <- data.frame(id = 1:4, s = c("abc  ", "abc", "abc", "abc\t"))
+
+  res <- df_compare(as_backend(base), as_backend(compare), id = "id")
+
+  # Only spaces are blanks: a trailing tab is a real difference.
+  expect_identical(differences(res)$id, c(3L, 4L))
+
+  res <- df_compare(
+    as_backend(base), as_backend(compare), id = "id",
+    ignore_trailing_blanks = FALSE
+  )
+
+  expect_identical(differences(res)$id, 1:4)
+})
+
+test_each_backend("trailing blanks are ignored in factor labels too", {
+  base <- data.frame(id = 1, s = factor("abc "))
+  compare <- data.frame(id = 1, s = "abc")
+
+  res <- df_compare(as_backend(base), as_backend(compare), id = "id")
+
+  expect_identical(return_code(res), 0L)
+})
+
 test_each_backend("an unknown Comparison method is an error", {
   df <- data.frame(id = 1, x = 1)
 
@@ -275,4 +301,13 @@ test_each_backend("an invalid Criterion or relative_delta is an error", {
     cmp(method = "relative", relative_delta = 2)
     cmp(method = "relative", relative_delta = -0.1)
   })
+})
+
+test_each_backend("ignore_trailing_blanks must be TRUE or FALSE", {
+  df <- data.frame(id = 1, x = 1)
+
+  expect_snapshot(
+    df_compare(as_backend(df), as_backend(df), id = "id", ignore_trailing_blanks = NA),
+    error = TRUE
+  )
 })

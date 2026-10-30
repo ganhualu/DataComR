@@ -1,5 +1,17 @@
 #' Compare two datasets the way PROC COMPARE does
 #'
+#' Each common variable belongs to a Type family: numeric (integer, double,
+#' logical), character (character, factor compared by labels), date or
+#' datetime (compared as instants, whatever the time zone). Variables of
+#' different families are Conflicting types and their values are not
+#' compared. The Comparison method and Criterion apply to the numeric family
+#' only; other families are compared exactly.
+#'
+#' Two missing values are equal and `NaN` counts as missing. Special missings
+#' (haven's tagged NAs, SAS's `.A` to `.Z`) are equal only with the same
+#' letter; this rule needs in-memory data frames, since arrow and duckdb do
+#' not keep the tags.
+#'
 #' @param base The Base dataset: the reference the comparison reports against.
 #' @param compare The Compare dataset, checked against `base`.
 #' @param id Character vector of ID variables used to pair observations.
@@ -10,14 +22,17 @@
 #' @param relative_delta The constant δ that `method = "relative"` adds to the
 #'   denominator, as in SAS's `METHOD=RELATIVE(δ)`: a number between 0 and 1,
 #'   0 by default as in SAS.
+#' @param ignore_trailing_blanks If `TRUE` (the default), character values
+#'   that differ only in trailing blanks are equal, as in SAS. Leading blanks
+#'   always count.
 #' @return A `df_compare` object.
 #' @export
 df_compare <- function(base, compare, id, method = "exact", criterion = 1e-5,
-                       relative_delta = 0) {
+                       relative_delta = 0, ignore_trailing_blanks = TRUE) {
   check_id(id)
   check_id_present(id, colnames(base), "Base")
   check_id_present(id, colnames(compare), "Compare")
-  rules <- comparison_rules(method, criterion, relative_delta)
+  rules <- comparison_rules(method, criterion, relative_delta, ignore_trailing_blanks)
 
   common <- setdiff(intersect(colnames(base), colnames(compare)), id)
   types <- variable_types(base, compare, common)
@@ -60,7 +75,11 @@ new_df_compare <- function(...) {
 #' Unequal values found by a comparison
 #'
 #' @param x A `df_compare` object.
-#' @return A tibble with one row per Unequal value.
+#' @return A tibble with one row per Unequal value: the ID variables,
+#'   `variable`, the `base` and `compare` values as text, and for numeric
+#'   variables `diff` (Compare minus Base) and `pct_diff` (`100 * diff / base`,
+#'   missing when the Base value is 0). `diff` and `pct_diff` are missing for
+#'   the other Type families.
 #' @export
 differences <- function(x) {
   x$differences

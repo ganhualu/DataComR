@@ -2,14 +2,25 @@ COMPARISON_METHODS <- c("exact", "absolute", "relative", "percent")
 
 # Validates the value comparison arguments of df_compare() and bundles them.
 comparison_rules <- function(method, criterion, relative_delta,
-                             call = rlang::caller_env()) {
+                             ignore_trailing_blanks, call = rlang::caller_env()) {
   method <- rlang::arg_match0(method, COMPARISON_METHODS, error_call = call)
   check_number(criterion, "a single non-negative number", min = 0, call = call)
   check_number(
     relative_delta, "a single number between 0 and 1",
     min = 0, max = 1, call = call
   )
-  list(method = method, criterion = criterion, relative_delta = relative_delta)
+  if (!rlang::is_bool(ignore_trailing_blanks)) {
+    cli::cli_abort(
+      "{.arg ignore_trailing_blanks} must be {.code TRUE} or {.code FALSE}, not {.obj_type_friendly {ignore_trailing_blanks}}.",
+      call = call
+    )
+  }
+  list(
+    method = method,
+    criterion = criterion,
+    relative_delta = relative_delta,
+    ignore_trailing_blanks = ignore_trailing_blanks
+  )
 }
 
 # SAS reads a negative CRITERION= as a multiple of machine precision; DataComR
@@ -46,10 +57,20 @@ unequal_values <- function(matched, id, variable, base_var, compare_var, family,
   b <- rlang::sym(base_var)
   cmp <- rlang::sym(compare_var)
   in_memory <- is.data.frame(matched)
+  lazy <- inherits(matched, "tbl_lazy")
+  b_missing <- is_missing(b, family, lazy)
+  cmp_missing <- is_missing(cmp, family, lazy)
+  # Missing equals missing; missing against non-missing is unequal.
   is_unequal <- rlang::expr(
-    (is.na(!!b) != is.na(!!cmp)) |
-      (!is.na(!!b) & !is.na(!!cmp) & !!values_unequal(b, cmp, family, rules, in_memory))
+    (!!b_missing != !!cmp_missing) |
+      (!(!!b_missing) & !(!!cmp_missing) &
+        !!values_unequal(b, cmp, family, rules, in_memory, lazy))
   )
+  if (family == "numeric" && in_memory) {
+    is_unequal <- rlang::expr(
+      !!is_unequal | (!!b_missing & !!cmp_missing & (!!na_tags_differ)(!!b, !!cmp))
+    )
+  }
   unequal <- matched |>
     dplyr::filter(!!is_unequal) |>
     dplyr::select(dplyr::all_of(id), base = !!b, compare = !!cmp) |>
@@ -71,11 +92,24 @@ unequal_values <- function(matched, id, variable, base_var, compare_var, family,
     tibble::as_tibble()
 }
 
+# Whether a value is missing, with NaN counted as missing. R and arrow's
+# is.na() already include NaN; in duckdb NaN is a value distinct from NULL,
+# so lazy tables also test it with duckdb's isnan(), passed through as SQL.
+# isnan(NULL) is NULL, which coalesce() turns into missing; a single call
+# also keeps the SQL free of operator-precedence surprises.
+is_missing <- function(x, family, lazy) {
+  if (family == "numeric" && lazy) {
+    rlang::expr(coalesce(isnan(as.numeric(!!x)), TRUE))
+  } else {
+    rlang::expr(is.na(!!x))
+  }
+}
+
 # The test for two non-missing values of one Type family, as an expression
 # the backend can evaluate. Only the numeric family uses the Comparison
 # method; dates are compared exactly and datetimes as instants (the stored
 # number of seconds, whatever the time zone).
-values_unequal <- function(x, y, family, rules, in_memory) {
+values_unequal <- function(x, y, family, rules, in_memory, lazy) {
   if (family == "datetime" && in_memory) {
     # R-only: comparing POSIXct with different time zones warns, although it
     # already compares instants. Backends store instants and compare them
@@ -88,10 +122,28 @@ values_unequal <- function(x, y, family, rules, in_memory) {
     numeric = numeric_unequal(
       rlang::expr(as.numeric(!!x)), rlang::expr(as.numeric(!!y)), rules
     ),
-    # Factors compare by label, whatever their levels.
-    character = rlang::expr(as.character(!!x) != as.character(!!y)),
+    character = rlang::expr(
+      !!character_label(x, rules, lazy) != !!character_label(y, rules, lazy)
+    ),
     rlang::expr(!!x != !!y)
   )
+}
+
+# The text a character-family value is compared by: factors by label,
+# whatever their levels, and without trailing blanks (spaces) unless asked.
+# Leading blanks are kept. Base R's sub() runs in R and arrow; dbplyr has no
+# sub() translation for duckdb but translates stringr's str_remove() (to
+# regexp_replace) without needing stringr installed.
+character_label <- function(x, rules, lazy) {
+  label <- rlang::expr(as.character(!!x))
+  if (rules$ignore_trailing_blanks) {
+    label <- if (lazy) {
+      rlang::expr(str_remove(!!label, " +$"))
+    } else {
+      rlang::expr(sub(" +$", "", !!label))
+    }
+  }
+  label
 }
 
 # SAS PROC COMPARE's test for two non-missing numeric values, x in Base and
@@ -115,6 +167,26 @@ numeric_unequal <- function(x, y, rules) {
   )
 }
 
+# R-only, so applied to in-memory data alone: special missings (SAS .A-.Z,
+# read by haven as tagged NAs) are equal only with the same letter, and a
+# plain NA or NaN carries no letter. The tag lives in the payload bits of a
+# double NA, which no backend translation can read and arrow and duckdb do
+# not keep. Tagged NAs exist only where haven made them, so without haven
+# there is nothing to tell apart.
+na_tags_differ <- function(x, y) {
+  if (!is.double(x) || !is.double(y) || !rlang::is_installed("haven")) {
+    return(rep(FALSE, length(x)))
+  }
+  na_letter(x) != na_letter(y)
+}
+
+# The letter of each tagged NA, "" for any other value.
+na_letter <- function(x) {
+  tag <- haven::na_tag(x)
+  tag[is.na(tag)] <- ""
+  tag
+}
+
 # Shows a value as text without losing precision: doubles use the shortest
 # representation (up to 17 significant digits) that reads back to the same
 # number, so values that compare unequal never display identically. Other
@@ -128,6 +200,10 @@ format_value <- function(x, numeric) {
   lossy[lossy] <- as.numeric(out[lossy]) != x[lossy]
   out[lossy] <- formatC(x[lossy], digits = 17, format = "g")
   out[is.na(x)] <- NA_character_
+  if (rlang::is_installed("haven")) {
+    tagged <- na_letter(x) != ""
+    out[tagged] <- paste0("NA(", na_letter(x)[tagged], ")")
+  }
   trimws(out)
 }
 
