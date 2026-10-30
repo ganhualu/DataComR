@@ -65,14 +65,20 @@ df_compare <- function(base, compare, id, method = "exact", criterion = 1e-5,
   types <- variable_types(base, compare, common)
   compared <- types[types$base_family == types$compare_family, ]
   pairs <- variable_pairs(compared$variable, compared$base_family)
-  matched <- match_observations(base, compare, id, pairs)
+  observations <- match_observations(base, compare, id, pairs)
+  matched <- observations$matched
+  warn_duplicate_ids(observations$duplicates)
 
   new_df_compare(
     differences = compare_values(matched, base, id, pairs, rules),
+    unmatched = observations$unmatched,
+    duplicates = observations$duplicates,
     conflicting_types = conflicting_types(types),
     type_differences = type_differences(types),
     id = id,
     compared = compared$variable,
+    base_only = setdiff(colnames(base), colnames(compare)),
+    compare_only = setdiff(colnames(compare), colnames(base)),
     n_obs = c(
       base = count_obs(base),
       compare = count_obs(compare),
@@ -110,6 +116,19 @@ new_df_compare <- function(...) {
 #' @export
 differences <- function(x) {
   x$differences
+}
+
+#' Unmatched observations found by a comparison
+#'
+#' @param x A `df_compare` object.
+#' @return A tibble with the ID variables of each Unmatched observation and a
+#'   `dataset` column, `"Base"` or `"Compare"`, naming the only dataset it is
+#'   in. Sorted by `dataset`, then by ID variables. ID values that are a
+#'   Duplicate ID in either dataset are never Unmatched observations; the
+#'   Listing reports them as Duplicate IDs instead.
+#' @export
+unmatched_rows <- function(x) {
+  x$unmatched
 }
 
 check_id <- function(id, call = rlang::caller_env()) {
