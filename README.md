@@ -1,5 +1,9 @@
 # DataComR
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/ganhualu/DataComR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ganhualu/DataComR/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 DataComR compares a Base dataset with a Compare dataset the way SAS PROC COMPARE does: observations paired by ID variables, SAS's numeric comparison methods, a PROC COMPARE-style Listing and a SYSINFO-style Return code. It gives users familiar with SAS PROC COMPARE a similar tool in R.
 
 DataComR is in early development.
