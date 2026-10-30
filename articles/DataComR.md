@@ -310,7 +310,7 @@ into R, so datasets larger than memory can be compared:
 
 con <- DBI::dbConnect(duckdb::duckdb())
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> ℹ /tmp/Rtmps3q41z/duckdb
+#> ℹ /tmp/Rtmpi9028t/duckdb
 #> This is removed when the R session ends.
 #> • Extensions are re-downloaded each session.
 #> • Secrets are lost.

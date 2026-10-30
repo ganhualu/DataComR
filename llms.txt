@@ -157,6 +157,9 @@ DataComR is in early development; its interface may still change.
 
 ## Acknowledgements
 
+DataComR was inspired by SAS PROC COMPARE and by the Python package
+[DataComPy](https://github.com/capitalone/datacompy).
+
 DataComR is developed with assistance from Claude Code (Anthropic).
 
 # Package index
