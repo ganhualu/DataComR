@@ -2,12 +2,14 @@
 # They are read from a zero-row prototype of each dataset, so the backend only
 # sends column types, never data.
 
-# One row per common variable: its Type family and type in each dataset.
-variable_types <- function(base, compare, common) {
-  base_proto <- prototype(base)[common]
-  compare_proto <- prototype(compare)[common]
+# One row per pair of Base and Compare variables, named by the Base variable:
+# its Type family and type in each dataset.
+variable_types <- function(base, compare, base_vars, compare_vars) {
+  base_proto <- prototype(base)[base_vars]
+  compare_proto <- prototype(compare)[compare_vars]
   tibble::tibble(
-    variable = common,
+    variable = base_vars,
+    compare_variable = compare_vars,
     base_family = vapply(base_proto, type_family, character(1), USE.NAMES = FALSE),
     compare_family = vapply(compare_proto, type_family, character(1), USE.NAMES = FALSE),
     base_type = vapply(base_proto, type_name, character(1), USE.NAMES = FALSE),
