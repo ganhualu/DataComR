@@ -1,0 +1,6 @@
+variable,type
+usubjid,character
+visit,numeric
+aval,numeric
+avalc,character
+flag,character

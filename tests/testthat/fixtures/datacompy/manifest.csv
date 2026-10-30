@@ -1,0 +1,6 @@
+fixture,dataset,id,method,criterion,matched,unmatched_base,unmatched_compare
+subjects_exact,subjects,usubjid visit,exact,0.0,5,2,3
+subjects_absolute,subjects,usubjid visit,absolute,0.25,5,2,3
+boundaries_exact,boundaries,id,exact,0.0,10,0,0
+boundaries_absolute,boundaries,id,absolute,0.25,10,0,0
+boundaries_absolute_wide,boundaries,id,absolute,0.5,10,0,0
