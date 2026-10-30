@@ -49,6 +49,9 @@
 #'   exactly, so `USUBJID` and `usubjid` are different variables. If `TRUE`,
 #'   names that differ only in case are paired; see the Variable pairing
 #'   section.
+#' @param max_print The most Unequal values the Listing shows per variable,
+#'   as SAS's `MAXPRINT=`; the Listing notes when a variable has more.
+#'   [differences()] always returns all of them.
 #' @return A `df_compare` object.
 #'
 #' @section Variable pairing:
@@ -112,8 +115,9 @@
 df_compare <- function(base, compare, id = NULL, var = NULL, with = NULL,
                        method = "exact", criterion = 1e-5,
                        relative_delta = 0, ignore_trailing_blanks = TRUE,
-                       ignore_case = FALSE) {
+                       ignore_case = FALSE, max_print = 50) {
   check_id(id)
+  check_max_print(max_print)
   # Attributes are read from the datasets as given, before one_backend() may
   # move one of them into another backend that drops R attributes.
   original <- list(base = base, compare = compare)
@@ -149,8 +153,20 @@ df_compare <- function(base, compare, id = NULL, var = NULL, with = NULL,
     original$base, original$compare, variables$base, variables$compare
   )
 
+  values <- compare_values(matched, base, id, pairs, rules)
+
   new_df_compare(
-    differences = compare_values(matched, base, id, pairs, rules),
+    differences = values$differences,
+    not_exactly_equal = values$not_exactly_equal,
+    rules = rules,
+    max_print = max_print,
+    n_vars = c(
+      base = length(colnames(original$base)),
+      compare = length(colnames(original$compare))
+    ),
+    compare_names = rlang::set_names(compared$compare_variable, compared$variable),
+    families = rlang::set_names(compared$base_family, compared$variable),
+    var = var,
     unmatched = observations$unmatched,
     duplicates = observations$duplicates,
     conflicting_types = conflicting_types(types),
@@ -287,5 +303,13 @@ check_id_present <- function(id, variables, dataset, call = rlang::caller_env())
       paste0("ID variable{?s} {.var {absent}} not found in the ", dataset, " dataset."),
       call = call
     )
+  }
+}
+
+check_max_print <- function(max_print, call = rlang::caller_env()) {
+  what <- "a positive whole number"
+  check_number(max_print, what, min = 1, call = call)
+  if (max_print != trunc(max_print)) {
+    cli::cli_abort("{.arg max_print} must be {what}, not {max_print}.", call = call)
   }
 }

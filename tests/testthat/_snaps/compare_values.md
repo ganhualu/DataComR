@@ -5,21 +5,40 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        4     2
+          Compare     4     2
       
       Variables Summary
-        Variables compared: 3
-        Variables with different types in the same Type family: 2
-          n: integer in Base, double in Compare
-          s: factor in Base, character in Compare
+      
+        Number of Variables in Common: 4.
+        Number of Variables with Different Types in the Same Type Family: 2.
+        Number of ID Variables: 1.
+      
+        Listing of Variables with Different Types in the Same Type Family
+          Variable  Base     Compare
+          n         integer  double
+          s         factor   character
       
       Observation Summary
-        Observations in Base:    2
-        Observations in Compare: 2
-        Matched on id: 2
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: id.
+        Number of Observations in Common: 2.
+        Total Number of Observations Read from Base: 2.
+        Total Number of Observations Read from Compare: 2.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 2.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 3.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -32,21 +51,40 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        4     2
+          Compare     4     2
       
       Variables Summary
-        Variables compared: 3
-        Variables with different types in the same Type family: 2
-          n: integer in Base, double in Compare
-          s: factor in Base, character in Compare
+      
+        Number of Variables in Common: 4.
+        Number of Variables with Different Types in the Same Type Family: 2.
+        Number of ID Variables: 1.
+      
+        Listing of Variables with Different Types in the Same Type Family
+          Variable  Base     Compare
+          n         integer  double
+          s         factor   character
       
       Observation Summary
-        Observations in Base:    2
-        Observations in Compare: 2
-        Matched on id: 2
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: id.
+        Number of Observations in Common: 2.
+        Total Number of Observations Read from Base: 2.
+        Total Number of Observations Read from Compare: 2.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 2.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 3.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -59,21 +97,40 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        4     2
+          Compare     4     2
       
       Variables Summary
-        Variables compared: 3
-        Variables with different types in the same Type family: 2
-          n: integer in Base, double in Compare
-          s: factor in Base, character in Compare
+      
+        Number of Variables in Common: 4.
+        Number of Variables with Different Types in the Same Type Family: 2.
+        Number of ID Variables: 1.
+      
+        Listing of Variables with Different Types in the Same Type Family
+          Variable  Base     Compare
+          n         integer  double
+          s         factor   character
       
       Observation Summary
-        Observations in Base:    2
-        Observations in Compare: 2
-        Matched on id: 2
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: id.
+        Number of Observations in Common: 2.
+        Total Number of Observations Read from Base: 2.
+        Total Number of Observations Read from Compare: 2.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 2.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 3.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -86,20 +143,55 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        3     2
+          Compare     3     2
       
       Variables Summary
-        Variables compared: 1
-        Variables with Conflicting types: 1
-          x: double (numeric) in Base, character (character) in Compare
+      
+        Number of Variables in Common: 3.
+        Number of Variables with Conflicting Types: 1.
+        Number of ID Variables: 1.
+      
+        Listing of Variables with Conflicting Types
+          Variable  Base              Compare
+          x         double (numeric)  character (character)
       
       Observation Summary
-        Observations in Base:    2
-        Observations in Compare: 2
-        Matched on id: 2
       
-      Values Summary
-        Variables with Unequal values: 1
-        Total Unequal values:          1
+        Observations are matched on ID variables: id.
+        Number of Observations in Common: 2.
+        Total Number of Observations Read from Base: 2.
+        Total Number of Observations Read from Compare: 2.
+      
+        Number of Observations with Some Compared Variables Unequal: 1.
+        Number of Observations with All Compared Variables Equal: 1.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 0.
+        Number of Variables Compared with Some Observations Unequal: 1.
+        Total Number of Values which Compare Unequal: 1.
+        Maximum Difference: 1.
+      
+      Variables with Unequal Values
+      
+          Variable  Type     Ndif  MaxDif
+          y         numeric     1       1
+      
+      Value Comparison Results for Variables
+      
+        _________________________________________________________
+                   ||       Base    Compare
+        id         ||          y          y      Diff.     % Diff
+        _________  ||  _________  _________  _________  _________
+                   ||
+        2          ||          2          3          1         50
+        _________________________________________________________
       
       Return code: 12288
 
@@ -110,20 +202,55 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        3     2
+          Compare     3     2
       
       Variables Summary
-        Variables compared: 1
-        Variables with Conflicting types: 1
-          x: double (numeric) in Base, character (character) in Compare
+      
+        Number of Variables in Common: 3.
+        Number of Variables with Conflicting Types: 1.
+        Number of ID Variables: 1.
+      
+        Listing of Variables with Conflicting Types
+          Variable  Base              Compare
+          x         double (numeric)  character (character)
       
       Observation Summary
-        Observations in Base:    2
-        Observations in Compare: 2
-        Matched on id: 2
       
-      Values Summary
-        Variables with Unequal values: 1
-        Total Unequal values:          1
+        Observations are matched on ID variables: id.
+        Number of Observations in Common: 2.
+        Total Number of Observations Read from Base: 2.
+        Total Number of Observations Read from Compare: 2.
+      
+        Number of Observations with Some Compared Variables Unequal: 1.
+        Number of Observations with All Compared Variables Equal: 1.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 0.
+        Number of Variables Compared with Some Observations Unequal: 1.
+        Total Number of Values which Compare Unequal: 1.
+        Maximum Difference: 1.
+      
+      Variables with Unequal Values
+      
+          Variable  Type     Ndif  MaxDif
+          y         numeric     1       1
+      
+      Value Comparison Results for Variables
+      
+        _________________________________________________________
+                   ||       Base    Compare
+        id         ||          y          y      Diff.     % Diff
+        _________  ||  _________  _________  _________  _________
+                   ||
+        2          ||          2          3          1         50
+        _________________________________________________________
       
       Return code: 12288
 
@@ -134,20 +261,55 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        3     2
+          Compare     3     2
       
       Variables Summary
-        Variables compared: 1
-        Variables with Conflicting types: 1
-          x: double (numeric) in Base, character (character) in Compare
+      
+        Number of Variables in Common: 3.
+        Number of Variables with Conflicting Types: 1.
+        Number of ID Variables: 1.
+      
+        Listing of Variables with Conflicting Types
+          Variable  Base              Compare
+          x         double (numeric)  character (character)
       
       Observation Summary
-        Observations in Base:    2
-        Observations in Compare: 2
-        Matched on id: 2
       
-      Values Summary
-        Variables with Unequal values: 1
-        Total Unequal values:          1
+        Observations are matched on ID variables: id.
+        Number of Observations in Common: 2.
+        Total Number of Observations Read from Base: 2.
+        Total Number of Observations Read from Compare: 2.
+      
+        Number of Observations with Some Compared Variables Unequal: 1.
+        Number of Observations with All Compared Variables Equal: 1.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 0.
+        Number of Variables Compared with Some Observations Unequal: 1.
+        Total Number of Values which Compare Unequal: 1.
+        Maximum Difference: 1.
+      
+      Variables with Unequal Values
+      
+          Variable  Type     Ndif  MaxDif
+          y         numeric     1       1
+      
+      Value Comparison Results for Variables
+      
+        _________________________________________________________
+                   ||       Base    Compare
+        id         ||          y          y      Diff.     % Diff
+        _________  ||  _________  _________  _________  _________
+                   ||
+        2          ||          2          3          1         50
+        _________________________________________________________
       
       Return code: 12288
 
@@ -158,23 +320,42 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        5     1
+          Compare     5     1
       
       Variables Summary
-        Variables compared: 0
-        Variables with Conflicting types: 4
-          a: Date (date) in Base, POSIXct (datetime) in Compare
-          b: POSIXct (datetime) in Base, double (numeric) in Compare
-          c: Date (date) in Base, character (character) in Compare
-          d: POSIXct (datetime) in Base, Date (date) in Compare
+      
+        Number of Variables in Common: 5.
+        Number of Variables with Conflicting Types: 4.
+        Number of ID Variables: 1.
+      
+        Listing of Variables with Conflicting Types
+          Variable  Base                Compare
+          a         Date (date)         POSIXct (datetime)
+          b         POSIXct (datetime)  double (numeric)
+          c         Date (date)         character (character)
+          d         POSIXct (datetime)  Date (date)
       
       Observation Summary
-        Observations in Base:    1
-        Observations in Compare: 1
-        Matched on id: 1
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: id.
+        Number of Observations in Common: 1.
+        Total Number of Observations Read from Base: 1.
+        Total Number of Observations Read from Compare: 1.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 1.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 0.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -187,23 +368,42 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        5     1
+          Compare     5     1
       
       Variables Summary
-        Variables compared: 0
-        Variables with Conflicting types: 4
-          a: Date (date) in Base, POSIXct (datetime) in Compare
-          b: POSIXct (datetime) in Base, double (numeric) in Compare
-          c: Date (date) in Base, character (character) in Compare
-          d: POSIXct (datetime) in Base, Date (date) in Compare
+      
+        Number of Variables in Common: 5.
+        Number of Variables with Conflicting Types: 4.
+        Number of ID Variables: 1.
+      
+        Listing of Variables with Conflicting Types
+          Variable  Base                Compare
+          a         Date (date)         POSIXct (datetime)
+          b         POSIXct (datetime)  double (numeric)
+          c         Date (date)         character (character)
+          d         POSIXct (datetime)  Date (date)
       
       Observation Summary
-        Observations in Base:    1
-        Observations in Compare: 1
-        Matched on id: 1
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: id.
+        Number of Observations in Common: 1.
+        Total Number of Observations Read from Base: 1.
+        Total Number of Observations Read from Compare: 1.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 1.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 0.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -216,23 +416,42 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        5     1
+          Compare     5     1
       
       Variables Summary
-        Variables compared: 0
-        Variables with Conflicting types: 4
-          a: Date (date) in Base, POSIXct (datetime) in Compare
-          b: POSIXct (datetime) in Base, double (numeric) in Compare
-          c: Date (date) in Base, character (character) in Compare
-          d: POSIXct (datetime) in Base, Date (date) in Compare
+      
+        Number of Variables in Common: 5.
+        Number of Variables with Conflicting Types: 4.
+        Number of ID Variables: 1.
+      
+        Listing of Variables with Conflicting Types
+          Variable  Base                Compare
+          a         Date (date)         POSIXct (datetime)
+          b         POSIXct (datetime)  double (numeric)
+          c         Date (date)         character (character)
+          d         POSIXct (datetime)  Date (date)
       
       Observation Summary
-        Observations in Base:    1
-        Observations in Compare: 1
-        Matched on id: 1
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: id.
+        Number of Observations in Common: 1.
+        Total Number of Observations Read from Base: 1.
+        Total Number of Observations Read from Compare: 1.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 1.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 0.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       

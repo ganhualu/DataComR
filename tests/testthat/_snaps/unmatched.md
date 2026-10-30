@@ -5,20 +5,36 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        3     3
+          Compare     3     3
       
       Variables Summary
-        Variables compared: 1
+      
+        Number of Variables in Common: 3.
+        Number of ID Variables: 2.
       
       Observation Summary
-        Observations in Base:    3
-        Observations in Compare: 3
-        Matched on usubjid, visit: 2
-        Observations in Base but not in Compare: 1
-        Observations in Compare but not in Base: 1
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: usubjid, visit.
+        Number of Observations in Common: 2.
+        Number of Observations in Base but not in Compare: 1.
+        Number of Observations in Compare but not in Base: 1.
+        Total Number of Observations Read from Base: 3.
+        Total Number of Observations Read from Compare: 3.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 2.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 1.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -31,20 +47,36 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        3     3
+          Compare     3     3
       
       Variables Summary
-        Variables compared: 1
+      
+        Number of Variables in Common: 3.
+        Number of ID Variables: 2.
       
       Observation Summary
-        Observations in Base:    3
-        Observations in Compare: 3
-        Matched on usubjid, visit: 2
-        Observations in Base but not in Compare: 1
-        Observations in Compare but not in Base: 1
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: usubjid, visit.
+        Number of Observations in Common: 2.
+        Number of Observations in Base but not in Compare: 1.
+        Number of Observations in Compare but not in Base: 1.
+        Total Number of Observations Read from Base: 3.
+        Total Number of Observations Read from Compare: 3.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 2.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 1.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -57,20 +89,36 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        3     3
+          Compare     3     3
       
       Variables Summary
-        Variables compared: 1
+      
+        Number of Variables in Common: 3.
+        Number of ID Variables: 2.
       
       Observation Summary
-        Observations in Base:    3
-        Observations in Compare: 3
-        Matched on usubjid, visit: 2
-        Observations in Base but not in Compare: 1
-        Observations in Compare but not in Base: 1
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: usubjid, visit.
+        Number of Observations in Common: 2.
+        Number of Observations in Base but not in Compare: 1.
+        Number of Observations in Compare but not in Base: 1.
+        Total Number of Observations Read from Base: 3.
+        Total Number of Observations Read from Compare: 3.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 2.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 1.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -83,20 +131,43 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        5     3
+          Compare     4     3
       
       Variables Summary
-        Variables compared: 2
-        Variables in Base but not in Compare: 2 (only_b1, only_b2)
-        Variables in Compare but not in Base: 1 (only_c)
+      
+        Number of Variables in Common: 3.
+        Number of Variables in Base but not in Compare: 2.
+        Number of Variables in Compare but not in Base: 1.
+        Number of ID Variables: 1.
+      
+        Listing of Variables in Base but not in Compare
+          only_b1
+          only_b2
+      
+        Listing of Variables in Compare but not in Base
+          only_c
       
       Observation Summary
-        Observations in Base:    3
-        Observations in Compare: 3
-        Matched on usubjid: 3
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: usubjid.
+        Number of Observations in Common: 3.
+        Total Number of Observations Read from Base: 3.
+        Total Number of Observations Read from Compare: 3.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 3.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 2.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -109,20 +180,43 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        5     3
+          Compare     4     3
       
       Variables Summary
-        Variables compared: 2
-        Variables in Base but not in Compare: 2 (only_b1, only_b2)
-        Variables in Compare but not in Base: 1 (only_c)
+      
+        Number of Variables in Common: 3.
+        Number of Variables in Base but not in Compare: 2.
+        Number of Variables in Compare but not in Base: 1.
+        Number of ID Variables: 1.
+      
+        Listing of Variables in Base but not in Compare
+          only_b1
+          only_b2
+      
+        Listing of Variables in Compare but not in Base
+          only_c
       
       Observation Summary
-        Observations in Base:    3
-        Observations in Compare: 3
-        Matched on usubjid: 3
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: usubjid.
+        Number of Observations in Common: 3.
+        Total Number of Observations Read from Base: 3.
+        Total Number of Observations Read from Compare: 3.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 3.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 2.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -135,20 +229,43 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        5     3
+          Compare     4     3
       
       Variables Summary
-        Variables compared: 2
-        Variables in Base but not in Compare: 2 (only_b1, only_b2)
-        Variables in Compare but not in Base: 1 (only_c)
+      
+        Number of Variables in Common: 3.
+        Number of Variables in Base but not in Compare: 2.
+        Number of Variables in Compare but not in Base: 1.
+        Number of ID Variables: 1.
+      
+        Listing of Variables in Base but not in Compare
+          only_b1
+          only_b2
+      
+        Listing of Variables in Compare but not in Base
+          only_c
       
       Observation Summary
-        Observations in Base:    3
-        Observations in Compare: 3
-        Matched on usubjid: 3
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: usubjid.
+        Number of Observations in Common: 3.
+        Total Number of Observations Read from Base: 3.
+        Total Number of Observations Read from Compare: 3.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 3.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 2.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -197,21 +314,40 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        3     5
+          Compare     3     4
       
       Variables Summary
-        Variables compared: 1
+      
+        Number of Variables in Common: 3.
+        Number of ID Variables: 2.
       
       Observation Summary
-        Observations in Base:    5
-        Observations in Compare: 4
-        Matched on usubjid, visit: 1
-        Duplicate IDs (not compared): 2
-          Base     usubjid=01, visit=1 (3 observations)
-          Compare  usubjid=03, visit=2 (2 observations)
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: usubjid, visit.
+        Number of Observations in Common: 1.
+        Number of Duplicate IDs (not compared): 2.
+        Total Number of Observations Read from Base: 5.
+        Total Number of Observations Read from Compare: 4.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 1.
+      
+        Listing of Duplicate IDs
+          Dataset  usubjid  visit  Observations
+          Base     01       1                 3
+          Compare  03       2                 2
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 1.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -230,21 +366,40 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        3     5
+          Compare     3     4
       
       Variables Summary
-        Variables compared: 1
+      
+        Number of Variables in Common: 3.
+        Number of ID Variables: 2.
       
       Observation Summary
-        Observations in Base:    5
-        Observations in Compare: 4
-        Matched on usubjid, visit: 1
-        Duplicate IDs (not compared): 2
-          Base     usubjid=01, visit=1 (3 observations)
-          Compare  usubjid=03, visit=2 (2 observations)
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: usubjid, visit.
+        Number of Observations in Common: 1.
+        Number of Duplicate IDs (not compared): 2.
+        Total Number of Observations Read from Base: 5.
+        Total Number of Observations Read from Compare: 4.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 1.
+      
+        Listing of Duplicate IDs
+          Dataset  usubjid  visit  Observations
+          Base     01       1                 3
+          Compare  03       2                 2
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 1.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
@@ -263,21 +418,40 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        3     5
+          Compare     3     4
       
       Variables Summary
-        Variables compared: 1
+      
+        Number of Variables in Common: 3.
+        Number of ID Variables: 2.
       
       Observation Summary
-        Observations in Base:    5
-        Observations in Compare: 4
-        Matched on usubjid, visit: 1
-        Duplicate IDs (not compared): 2
-          Base     usubjid=01, visit=1 (3 observations)
-          Compare  usubjid=03, visit=2 (2 observations)
       
-      Values Summary
-        Variables with Unequal values: 0
-        Total Unequal values:          0
+        Observations are matched on ID variables: usubjid, visit.
+        Number of Observations in Common: 1.
+        Number of Duplicate IDs (not compared): 2.
+        Total Number of Observations Read from Base: 5.
+        Total Number of Observations Read from Compare: 4.
+      
+        Number of Observations with Some Compared Variables Unequal: 0.
+        Number of Observations with All Compared Variables Equal: 1.
+      
+        Listing of Duplicate IDs
+          Dataset  usubjid  visit  Observations
+          Base     01       1                 3
+          Compare  03       2                 2
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 1.
+        Number of Variables Compared with Some Observations Unequal: 0.
+        Total Number of Values which Compare Unequal: 0.
       
       NOTE: No unequal values were found. All values compared are exactly equal.
       
