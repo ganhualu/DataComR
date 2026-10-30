@@ -22,3 +22,4 @@ inst/doc
 
 # Claude Code local state (agent worktrees)
 .claude/
+docs

@@ -12,6 +12,7 @@ Compares a base dataset with a compare dataset following the semantics of SAS PR
 Useful links:
 \itemize{
   \item \url{https://github.com/ganhualu/DataComR}
+  \item \url{https://ganhualu.github.io/DataComR/}
   \item Report bugs at \url{https://github.com/ganhualu/DataComR/issues}
 }
 

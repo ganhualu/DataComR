@@ -134,7 +134,7 @@ return_code(comparison)
 | `OUT=` differences              | `differences()`, `unmatched_rows()`         |
 | `&SYSINFO`                      | `return_code()`                             |
 
-See `vignette("DataComR")` for the full guide, including the Return code bits and where DataComR deliberately differs from PROC COMPARE. One difference to know up front: variable names are **case-sensitive** by default, as R's are; set `ignore_case = TRUE` to match names regardless of case, as SAS does.
+See the [documentation site](https://ganhualu.github.io/DataComR/), or `vignette("DataComR")`, for the full guide, including the Return code bits and where DataComR deliberately differs from PROC COMPARE. One difference to know up front: variable names are **case-sensitive** by default, as R's are; set `ignore_case = TRUE` to match names regardless of case, as SAS does.
 
 ## Status
 
