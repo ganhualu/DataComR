@@ -41,6 +41,7 @@ return_code_flags <- function(x) {
     base_var = length(x$base_only) > 0,
     compare_var = length(x$compare_only) > 0,
     unequal_value = nrow(differences(x)) > 0,
+    conflicting_type = nrow(x$conflicting_types) > 0,
     duplicate_id = nrow(x$duplicates) > 0
   )
 }

@@ -13,7 +13,9 @@ expected <- tibble::tibble(
   visit = c(1, 2),
   variable = c("aval", "aval_c"),
   base = c("20", "c"),
-  compare = c("21", NA)
+  compare = c("21", NA),
+  diff = c(1, NA),
+  pct_diff = c(5, NA)
 )
 
 # Every ordered pair of different backends, e.g. Base a data frame and Compare

@@ -10,7 +10,11 @@ differences(x)
 \item{x}{A \code{df_compare} object.}
 }
 \value{
-A tibble with one row per Unequal value.
+A tibble with one row per Unequal value: the ID variables,
+\code{variable}, the \code{base} and \code{compare} values as text, and for numeric
+variables \code{diff} (Compare minus Base) and \code{pct_diff} (\code{100 * diff / base},
+missing when the Base value is 0). \code{diff} and \code{pct_diff} are missing for
+the other Type families.
 }
 \description{
 Unequal values found by a comparison

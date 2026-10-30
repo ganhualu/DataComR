@@ -1,11 +1,33 @@
 #' Compare two datasets the way PROC COMPARE does
 #'
+#' Each common variable belongs to a Type family: numeric (integer, double,
+#' logical), character (character, factor compared by labels), date or
+#' datetime (compared as instants, whatever the time zone). Variables of
+#' different families are Conflicting types and their values are not
+#' compared. The Comparison method and Criterion apply to the numeric family
+#' only; other families are compared exactly.
+#'
+#' Two missing values are equal and `NaN` counts as missing. Special missings
+#' (haven's tagged NAs, SAS's `.A` to `.Z`) are equal only with the same
+#' letter; this rule needs in-memory data frames, since arrow and duckdb do
+#' not keep the tags.
+#'
 #' @param base The Base dataset: the reference the comparison reports against.
 #'   A data frame (including tibbles), an arrow Table or Dataset, or a duckdb
 #'   table (a dbplyr lazy table on a duckdb connection).
 #' @param compare The Compare dataset, checked against `base`. Any of the
 #'   types accepted for `base`, in any combination with it.
 #' @param id Character vector of ID variables used to pair observations.
+#' @param method The Comparison method for numeric variables: `"exact"`,
+#'   `"absolute"`, `"relative"` or `"percent"`, as SAS's `METHOD=`.
+#' @param criterion The Criterion the method tests differences against, as
+#'   SAS's `CRITERION=`.
+#' @param relative_delta The constant δ that `method = "relative"` adds to the
+#'   denominator, as in SAS's `METHOD=RELATIVE(δ)`: a number between 0 and 1,
+#'   0 by default as in SAS.
+#' @param ignore_trailing_blanks If `TRUE` (the default), character values
+#'   that differ only in trailing blanks are equal, as in SAS. Leading blanks
+#'   always count.
 #' @return A `df_compare` object.
 #'
 #' @section Backends:
@@ -48,7 +70,8 @@
 #' and no Attribute differences are reported, rather than reporting false
 #' ones.
 #' @export
-df_compare <- function(base, compare, id) {
+df_compare <- function(base, compare, id, method = "exact", criterion = 1e-5,
+                       relative_delta = 0, ignore_trailing_blanks = TRUE) {
   check_id(id)
   # Attributes are read from the datasets as given, before one_backend() may
   # move one of them into another backend that drops R attributes.
@@ -59,9 +82,12 @@ df_compare <- function(base, compare, id) {
   compare <- inputs$compare
   check_id_present(id, colnames(base), "Base")
   check_id_present(id, colnames(compare), "Compare")
+  rules <- comparison_rules(method, criterion, relative_delta, ignore_trailing_blanks)
 
   common <- setdiff(intersect(colnames(base), colnames(compare)), id)
-  pairs <- variable_pairs(common)
+  types <- variable_types(base, compare, common)
+  compared <- types[types$base_family == types$compare_family, ]
+  pairs <- variable_pairs(compared$variable, compared$base_family)
   observations <- match_observations(base, compare, id, pairs)
   matched <- observations$matched
   warn_duplicate_ids(observations$duplicates)
@@ -70,11 +96,13 @@ df_compare <- function(base, compare, id) {
   )
 
   new_df_compare(
-    differences = compare_values(matched, base, id, pairs),
+    differences = compare_values(matched, base, id, pairs, rules),
     unmatched = observations$unmatched,
     duplicates = observations$duplicates,
+    conflicting_types = conflicting_types(types),
+    type_differences = type_differences(types),
     id = id,
-    compared = common,
+    compared = compared$variable,
     base_only = setdiff(colnames(base), colnames(compare)),
     compare_only = setdiff(colnames(compare), colnames(base)),
     dataset_labels = attribute_results$dataset_labels,
@@ -88,12 +116,14 @@ df_compare <- function(base, compare, id) {
 }
 
 # Internal names for each common variable's Base and Compare versions after
-# the join (.base_1, .compare_1, ...), so original names can never collide.
-variable_pairs <- function(common) {
+# the join (.base_1, .compare_1, ...), so original names can never collide,
+# with the Type family both versions share.
+variable_pairs <- function(common, family) {
   list(
     common = common,
     base = paste0(".base_", seq_along(common)),
-    compare = paste0(".compare_", seq_along(common))
+    compare = paste0(".compare_", seq_along(common)),
+    family = family
   )
 }
 
@@ -106,7 +136,11 @@ new_df_compare <- function(...) {
 #' Unequal values found by a comparison
 #'
 #' @param x A `df_compare` object.
-#' @return A tibble with one row per Unequal value.
+#' @return A tibble with one row per Unequal value: the ID variables,
+#'   `variable`, the `base` and `compare` values as text, and for numeric
+#'   variables `diff` (Compare minus Base) and `pct_diff` (`100 * diff / base`,
+#'   missing when the Base value is 0). `diff` and `pct_diff` are missing for
+#'   the other Type families.
 #' @export
 differences <- function(x) {
   x$differences

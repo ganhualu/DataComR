@@ -78,7 +78,10 @@ test_each_backend("Duplicate IDs are not compared while unique IDs still are", {
   expect_identical(return_code(res), 4096L + 65536L)
   expect_identical(
     differences(res),
-    tibble::tibble(usubjid = "03", visit = 2, variable = "aval", base = "30", compare = "31")
+    tibble::tibble(
+      usubjid = "03", visit = 2, variable = "aval", base = "30", compare = "31",
+      diff = 1, pct_diff = 10 / 3
+    )
   )
   expect_identical(nrow(unmatched_rows(res)), 0L)
 })

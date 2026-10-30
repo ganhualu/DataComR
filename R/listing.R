@@ -31,6 +31,14 @@ listing_variables_summary <- function(x) {
   cli::cat_line("  Variables compared: ", length(x$compared))
   listing_one_sided_variables(x$base_only, "Base", "Compare")
   listing_one_sided_variables(x$compare_only, "Compare", "Base")
+  listing_type_lines(
+    x$conflicting_types,
+    "Variables with Conflicting types"
+  )
+  listing_type_lines(
+    x$type_differences,
+    "Variables with different types in the same Type family"
+  )
   listing_attribute_differences(x$attribute_differences)
 }
 
@@ -41,6 +49,19 @@ listing_one_sided_variables <- function(variables, dataset, other) {
       " (", paste(variables, collapse = ", "), ")"
     )
   }
+}
+
+# One line per variable, showing its type in each dataset. Nothing is shown
+# when there are no such variables.
+listing_type_lines <- function(types, heading) {
+  if (is.null(types) || nrow(types) == 0) {
+    return(invisible())
+  }
+  cli::cat_line("  ", heading, ": ", nrow(types))
+  cli::cat_line(paste0(
+    "    ", types$variable, ": ", types$base_type, " in Base, ",
+    types$compare_type, " in Compare"
+  ))
 }
 
 listing_attribute_differences <- function(attribute_differences) {
@@ -91,7 +112,9 @@ listing_duplicate_ids <- function(duplicates, id) {
   if (nrow(duplicates) == 0) {
     return(invisible())
   }
-  id_values <- lapply(id, function(v) paste0(v, "=", format_value(duplicates[[v]])))
+  id_values <- lapply(id, function(v) {
+    paste0(v, "=", format_value(duplicates[[v]], numeric = is.numeric(duplicates[[v]])))
+  })
   id_values <- do.call(paste, c(id_values, sep = ", "))
   cli::cat_line("  Duplicate IDs (not compared): ", nrow(duplicates))
   cli::cat_line(
