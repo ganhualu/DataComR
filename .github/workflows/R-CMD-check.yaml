@@ -9,6 +9,11 @@ name: R-CMD-check.yaml
 
 permissions: read-all
 
+# A newer push to the same PR or branch cancels the older, now-stale run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
@@ -23,6 +28,9 @@ jobs:
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'oldrel-1'}
+        # macOS runners are scarce on private repos: check macOS only on
+        # pushes to main, not on every PR.
+        exclude: ${{ github.event_name == 'pull_request' && fromJSON('[{"config":{"os":"macos-latest","r":"release"}}]') || fromJSON('[]') }}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
