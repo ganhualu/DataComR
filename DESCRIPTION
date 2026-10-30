@@ -18,7 +18,12 @@ Imports:
     tibble,
     utils
 Suggests:
-    testthat (>= 3.0.0)
+    arrow,
+    DBI,
+    dbplyr,
+    duckdb,
+    testthat (>= 3.0.0),
+    withr
 Config/testthat/edition: 3
 URL: https://github.com/ganhualu/DataComR
 BugReports: https://github.com/ganhualu/DataComR/issues
