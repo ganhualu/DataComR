@@ -15,9 +15,12 @@ df_compare(
 )
 }
 \arguments{
-\item{base}{The Base dataset: the reference the comparison reports against.}
+\item{base}{The Base dataset: the reference the comparison reports against.
+A data frame (including tibbles), an arrow Table or Dataset, or a duckdb
+table (a dbplyr lazy table on a duckdb connection).}
 
-\item{compare}{The Compare dataset, checked against \code{base}.}
+\item{compare}{The Compare dataset, checked against \code{base}. Any of the
+types accepted for \code{base}, in any combination with it.}
 
 \item{id}{Character vector of ID variables used to pair observations.}
 
@@ -52,3 +55,26 @@ Two missing values are equal and \code{NaN} counts as missing. Special missings
 letter; this rule needs in-memory data frames, since arrow and duckdb do
 not keep the tags.
 }
+\section{Backends}{
+
+The comparison runs as dplyr verbs inside the datasets' own backend; only
+observation counts and Unequal values are collected into R, never the full
+datasets. When the two datasets live in different backends they are brought
+into one without collecting them:
+\itemize{
+\item a data frame compared with a duckdb table is registered in the duckdb
+connection as a view;
+\item a data frame compared with arrow data is converted to an arrow Table;
+\item arrow data compared with a duckdb table is registered in the duckdb
+connection through arrow's zero-copy interface.
+}
+
+Two duckdb tables must share one connection. arrow, duckdb, dbplyr and DBI
+are optional; an informative error names any that an input needs but that
+is not installed.
+
+Attributes and special missings that a backend does not preserve (for
+example variable labels, SAS formats or haven tagged \code{NA}s in a duckdb
+table) are treated as absent for that dataset.
+}
+
