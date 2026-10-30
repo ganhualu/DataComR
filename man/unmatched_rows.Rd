@@ -14,7 +14,9 @@ A tibble with the ID variables of each Unmatched observation and a
 \code{dataset} column, \code{"Base"} or \code{"Compare"}, naming the only dataset it is
 in. Sorted by \code{dataset}, then by ID variables. ID values that are a
 Duplicate ID in either dataset are never Unmatched observations; the
-Listing reports them as Duplicate IDs instead.
+Listing reports them as Duplicate IDs instead. When observations were
+matched by position (no \code{id}), an \code{obs} column with the observation
+number takes the place of the ID variables.
 }
 \description{
 Unmatched observations found by a comparison
