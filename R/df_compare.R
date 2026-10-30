@@ -1,9 +1,32 @@
 #' Compare two datasets the way PROC COMPARE does
 #'
 #' @param base The Base dataset: the reference the comparison reports against.
-#' @param compare The Compare dataset, checked against `base`.
+#'   A data frame (including tibbles), an arrow Table or Dataset, or a duckdb
+#'   table (a dbplyr lazy table on a duckdb connection).
+#' @param compare The Compare dataset, checked against `base`. Any of the
+#'   types accepted for `base`, in any combination with it.
 #' @param id Character vector of ID variables used to pair observations.
 #' @return A `df_compare` object.
+#'
+#' @section Backends:
+#' The comparison runs as dplyr verbs inside the datasets' own backend; only
+#' observation counts and Unequal values are collected into R, never the full
+#' datasets. When the two datasets live in different backends they are brought
+#' into one without collecting them:
+#'
+#' * a data frame compared with a duckdb table is registered in the duckdb
+#'   connection as a view;
+#' * a data frame compared with arrow data is converted to an arrow Table;
+#' * arrow data compared with a duckdb table is registered in the duckdb
+#'   connection through arrow's zero-copy interface.
+#'
+#' Two duckdb tables must share one connection. arrow, duckdb, dbplyr and DBI
+#' are optional; an informative error names any that an input needs but that
+#' is not installed.
+#'
+#' Special missings that a backend does not preserve (for example haven
+#' tagged `NA`s in a duckdb table) are treated as absent for that dataset; for
+#' attributes, see the Attribute differences section.
 #'
 #' @section Attribute differences:
 #' As PROC COMPARE does, `df_compare()` compares metadata as well as values.
@@ -27,20 +50,29 @@
 #' @export
 df_compare <- function(base, compare, id) {
   check_id(id)
+  # Attributes are read from the datasets as given, before one_backend() may
+  # move one of them into another backend that drops R attributes.
+  original <- list(base = base, compare = compare)
+  inputs <- one_backend(base, compare)
+  on.exit(inputs$cleanup(), add = TRUE)
+  base <- inputs$base
+  compare <- inputs$compare
   check_id_present(id, colnames(base), "Base")
   check_id_present(id, colnames(compare), "Compare")
 
   common <- setdiff(intersect(colnames(base), colnames(compare)), id)
   pairs <- variable_pairs(common)
   matched <- match_observations(base, compare, id, pairs)
-  attributes <- compare_attributes(base, compare, intersect(colnames(base), colnames(compare)))
+  attribute_results <- compare_attributes(
+    original$base, original$compare, intersect(colnames(base), colnames(compare))
+  )
 
   new_df_compare(
     differences = compare_values(matched, base, id, pairs),
     id = id,
     compared = common,
-    dataset_labels = attributes$dataset_labels,
-    attribute_differences = attributes$attribute_differences,
+    dataset_labels = attribute_results$dataset_labels,
+    attribute_differences = attribute_results$attribute_differences,
     n_obs = c(
       base = count_obs(base),
       compare = count_obs(compare),
