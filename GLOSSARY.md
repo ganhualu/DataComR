@@ -1,6 +1,6 @@
 # DataComR
 
-An R package that compares two datasets the way SAS PROC COMPARE does, aimed first at clinical and pharma validation, where an R result must be shown to match a SAS (or independently programmed) result.
+An R package that compares two datasets the way SAS PROC COMPARE does, giving users familiar with PROC COMPARE a similar tool in R.
 
 ## Datasets and matching
 

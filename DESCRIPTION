@@ -1,0 +1,24 @@
+Package: DataComR
+Title: Compare Datasets the Way SAS PROC COMPARE Does
+Version: 0.0.0.9000
+Authors@R:
+    person("GH", "Lu", , "ganhualu@gmail.com", role = c("aut", "cre"))
+Description: Compares a base dataset with a compare dataset following the
+    semantics of SAS PROC COMPARE: ID variables, numeric comparison methods,
+    a PROC COMPARE-style listing and a SYSINFO-style return code. Gives
+    users familiar with SAS PROC COMPARE a similar tool in R.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 8.0.0
+Imports:
+    cli,
+    dplyr,
+    rlang,
+    tibble,
+    utils
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+URL: https://github.com/ganhualu/DataComR
+BugReports: https://github.com/ganhualu/DataComR/issues
