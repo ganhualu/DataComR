@@ -21,7 +21,10 @@ test_each_backend("a changed numeric value is one Unequal value with its ID valu
   expect_identical(return_code(res), 4096L)
   expect_identical(
     differences(res),
-    tibble::tibble(usubjid = "02", visit = 1, variable = "aval", base = "20", compare = "21")
+    tibble::tibble(
+      usubjid = "02", visit = 1, variable = "aval", base = "20", compare = "21",
+      diff = 1, pct_diff = 5
+    )
   )
 })
 
@@ -40,7 +43,9 @@ test_each_backend("Unequal values are reported per variable, in Base variable or
       visit = c(1, 2),
       variable = c("aval", "aval_c"),
       base = c("10.5", "c"),
-      compare = c("11", "z")
+      compare = c("11", "z"),
+      diff = c(0.5, NA),
+      pct_diff = c(100 * 0.5 / 10.5, NA)
     )
   )
 })
@@ -55,7 +60,10 @@ test_each_backend("a value against a missing value is unequal; two missing value
 
   expect_identical(
     differences(res),
-    tibble::tibble(usubjid = "01", visit = 1, variable = "aval_c", base = "a", compare = NA_character_)
+    tibble::tibble(
+      usubjid = "01", visit = 1, variable = "aval_c", base = "a", compare = NA_character_,
+      diff = NA_real_, pct_diff = NA_real_
+    )
   )
 })
 
