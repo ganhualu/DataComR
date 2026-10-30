@@ -34,8 +34,10 @@ type_differences <- function(types) {
   differ[c("variable", "base_type", "compare_type")]
 }
 
+# A named list of zero-length columns (a list, so that `[` selects columns
+# whatever the input class, data.table included).
 prototype <- function(data) {
-  dplyr::collect(utils::head(data, 0))
+  as.list(dplyr::collect(utils::head(data, 0)))
 }
 
 # Dates and datetimes are checked first: they are stored as numbers but form

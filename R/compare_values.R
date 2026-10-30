@@ -99,7 +99,8 @@ unequal_values <- function(matched, id, variable, base_var, compare_var, family,
 # also keeps the SQL free of operator-precedence surprises.
 is_missing <- function(x, family, lazy) {
   if (family == "numeric" && lazy) {
-    rlang::expr(coalesce(isnan(as.numeric(!!x)), TRUE))
+    # Built with call2(): these are SQL names, not R functions.
+    rlang::call2("coalesce", rlang::call2("isnan", rlang::expr(as.numeric(!!x))), TRUE)
   } else {
     rlang::expr(is.na(!!x))
   }
@@ -138,7 +139,7 @@ character_label <- function(x, rules, lazy) {
   label <- rlang::expr(as.character(!!x))
   if (rules$ignore_trailing_blanks) {
     label <- if (lazy) {
-      rlang::expr(str_remove(!!label, " +$"))
+      rlang::call2("str_remove", label, " +$")
     } else {
       rlang::expr(sub(" +$", "", !!label))
     }
