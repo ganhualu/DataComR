@@ -12,12 +12,16 @@ df_compare <- function(base, compare, id) {
 
   common <- setdiff(intersect(colnames(base), colnames(compare)), id)
   pairs <- variable_pairs(common)
-  matched <- match_observations(base, compare, id, pairs)
+  observations <- match_observations(base, compare, id, pairs)
+  matched <- observations$matched
 
   new_df_compare(
     differences = compare_values(matched, base, id, pairs),
+    unmatched = observations$unmatched,
     id = id,
     compared = common,
+    base_only = setdiff(colnames(base), colnames(compare)),
+    compare_only = setdiff(colnames(compare), colnames(base)),
     n_obs = c(
       base = count_obs(base),
       compare = count_obs(compare),
@@ -49,6 +53,17 @@ new_df_compare <- function(...) {
 #' @export
 differences <- function(x) {
   x$differences
+}
+
+#' Unmatched observations found by a comparison
+#'
+#' @param x A `df_compare` object.
+#' @return A tibble with the ID variables of each Unmatched observation and a
+#'   `dataset` column, `"Base"` or `"Compare"`, naming the only dataset it is
+#'   in. Sorted by `dataset`, then by ID variables.
+#' @export
+unmatched_rows <- function(x) {
+  x$unmatched
 }
 
 check_id <- function(id, call = rlang::caller_env()) {
