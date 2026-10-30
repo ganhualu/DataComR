@@ -17,7 +17,15 @@
 #'   table (a dbplyr lazy table on a duckdb connection).
 #' @param compare The Compare dataset, checked against `base`. Any of the
 #'   types accepted for `base`, in any combination with it.
-#' @param id Character vector of ID variables used to pair observations.
+#' @param id Character vector of ID variables used to pair observations, or
+#'   `NULL` (the default) to match observations by position, as SAS does
+#'   without an `ID` statement: the first Base observation with the first
+#'   Compare observation, and so on. The extra observations of the longer
+#'   dataset are then Unmatched observations, and [differences()] and
+#'   [unmatched_rows()] identify observations by an `obs` column holding the
+#'   observation number. Matching by position needs in-memory data frames,
+#'   since the observation order of arrow and duckdb data is not guaranteed;
+#'   for those, `id` is required.
 #' @param method The Comparison method for numeric variables: `"exact"`,
 #'   `"absolute"`, `"relative"` or `"percent"`, as SAS's `METHOD=`.
 #' @param criterion The Criterion the method tests differences against, as
@@ -70,12 +78,19 @@
 #' and no Attribute differences are reported, rather than reporting false
 #' ones.
 #' @export
-df_compare <- function(base, compare, id, method = "exact", criterion = 1e-5,
+df_compare <- function(base, compare, id = NULL, method = "exact", criterion = 1e-5,
                        relative_delta = 0, ignore_trailing_blanks = TRUE) {
   check_id(id)
   # Attributes are read from the datasets as given, before one_backend() may
   # move one of them into another backend that drops R attributes.
   original <- list(base = base, compare = compare)
+  by_position <- is.null(id)
+  if (by_position) {
+    check_positional(base, compare)
+    base <- with_observation_numbers(base)
+    compare <- with_observation_numbers(compare)
+    id <- OBSERVATION_NUMBER
+  }
   inputs <- one_backend(base, compare)
   on.exit(inputs$cleanup(), add = TRUE)
   base <- inputs$base
@@ -102,6 +117,7 @@ df_compare <- function(base, compare, id, method = "exact", criterion = 1e-5,
     conflicting_types = conflicting_types(types),
     type_differences = type_differences(types),
     id = id,
+    by_position = by_position,
     compared = compared$variable,
     base_only = setdiff(colnames(base), colnames(compare)),
     compare_only = setdiff(colnames(compare), colnames(base)),
@@ -140,7 +156,9 @@ new_df_compare <- function(...) {
 #'   `variable`, the `base` and `compare` values as text, and for numeric
 #'   variables `diff` (Compare minus Base) and `pct_diff` (`100 * diff / base`,
 #'   missing when the Base value is 0). `diff` and `pct_diff` are missing for
-#'   the other Type families.
+#'   the other Type families. When observations were matched by position (no
+#'   `id`), an `obs` column with the observation number takes the place of
+#'   the ID variables.
 #' @export
 differences <- function(x) {
   x$differences
@@ -153,13 +171,66 @@ differences <- function(x) {
 #'   `dataset` column, `"Base"` or `"Compare"`, naming the only dataset it is
 #'   in. Sorted by `dataset`, then by ID variables. ID values that are a
 #'   Duplicate ID in either dataset are never Unmatched observations; the
-#'   Listing reports them as Duplicate IDs instead.
+#'   Listing reports them as Duplicate IDs instead. When observations were
+#'   matched by position (no `id`), an `obs` column with the observation
+#'   number takes the place of the ID variables.
 #' @export
 unmatched_rows <- function(x) {
   x$unmatched
 }
 
+# The variable that numbers observations when they are matched by position,
+# standing in for ID variables in differences() and unmatched_rows().
+OBSERVATION_NUMBER <- "obs"
+
+# Numbers the observations of an in-memory data frame 1, 2, ... in their
+# order, so that matching on the number pairs them by position.
+with_observation_numbers <- function(data) {
+  dplyr::mutate(
+    dplyr::ungroup(data),
+    !!OBSERVATION_NUMBER := seq_len(nrow(data)),
+    .before = 1
+  )
+}
+
+# Matching by position needs a guaranteed observation order, which only
+# in-memory data frames have (ADR 0001), and a free name for the observation
+# number, which must never overwrite a variable.
+check_positional <- function(base, compare, call = rlang::caller_env()) {
+  kinds <- c(
+    Base = backend_of(base, "Base", call),
+    Compare = backend_of(compare, "Compare", call)
+  )
+  not_data_frames <- names(kinds)[kinds != "data_frame"]
+  if (length(not_data_frames) > 0) {
+    cli::cli_abort(
+      c(
+        "ID variables are required to compare arrow or duckdb data.",
+        "i" = "Without {.arg id}, observations are matched by position, but the observation order of arrow and duckdb data is not guaranteed.",
+        "x" = "The {not_data_frames} dataset{?s} {?is/are} not {?a data frame/data frames}.",
+        "i" = "Name the ID variables in {.arg id}."
+      ),
+      call = call
+    )
+  }
+  for (dataset in names(kinds)) {
+    data <- if (dataset == "Base") base else compare
+    if (OBSERVATION_NUMBER %in% colnames(data)) {
+      cli::cli_abort(
+        c(
+          "The {dataset} dataset has a variable named {.var {OBSERVATION_NUMBER}}, which DataComR uses for observation numbers when matching by position.",
+          "i" = "Name the ID variables in {.arg id}, or rename {.var {OBSERVATION_NUMBER}}."
+        ),
+        call = call
+      )
+    }
+  }
+}
+
 check_id <- function(id, call = rlang::caller_env()) {
+  if (is.null(id)) {
+    return(invisible())
+  }
   if (!is.character(id) || length(id) == 0) {
     cli::cli_abort(
       "{.arg id} must be a character vector naming at least one ID variable.",

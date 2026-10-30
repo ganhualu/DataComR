@@ -14,7 +14,9 @@ A tibble with one row per Unequal value: the ID variables,
 \code{variable}, the \code{base} and \code{compare} values as text, and for numeric
 variables \code{diff} (Compare minus Base) and \code{pct_diff} (\code{100 * diff / base},
 missing when the Base value is 0). \code{diff} and \code{pct_diff} are missing for
-the other Type families.
+the other Type families. When observations were matched by position (no
+\code{id}), an \code{obs} column with the observation number takes the place of
+the ID variables.
 }
 \description{
 Unequal values found by a comparison
