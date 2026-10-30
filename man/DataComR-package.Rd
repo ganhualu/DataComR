@@ -6,7 +6,7 @@
 \alias{DataComR-package}
 \title{DataComR: Compare Datasets the Way SAS PROC COMPARE Does}
 \description{
-Compares a base dataset with a compare dataset following the semantics of SAS PROC COMPARE: ID variables, numeric comparison methods, a PROC COMPARE-style listing and a SYSINFO-style return code. Aimed at clinical and pharmaceutical validation.
+Compares a base dataset with a compare dataset following the semantics of SAS PROC COMPARE: ID variables, numeric comparison methods, a PROC COMPARE-style listing and a SYSINFO-style return code. Gives users familiar with SAS PROC COMPARE a similar tool in R.
 }
 \seealso{
 Useful links:
@@ -17,11 +17,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Ganhua Lu \email{ganhualu@gmail.com}
+\strong{Maintainer}: GH Lu \email{ganhualu@gmail.com}
 
 Authors:
 \itemize{
-  \item Ganhua Lu \email{ganhualu@gmail.com}
+  \item GH Lu \email{ganhualu@gmail.com}
 }
 
 }

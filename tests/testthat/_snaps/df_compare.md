@@ -22,13 +22,15 @@
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
       
+      Variables Summary
+        Variables compared: 2
+      
       Observation Summary
         Observations in Base:    3
         Observations in Compare: 3
         Matched on usubjid, visit: 3
       
       Values Summary
-        Variables compared:            2
         Variables with Unequal values: 0
         Total Unequal values:          0
       
@@ -41,13 +43,15 @@
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
       
+      Variables Summary
+        Variables compared: 2
+      
       Observation Summary
         Observations in Base:    3
         Observations in Compare: 3
         Matched on usubjid, visit: 3
       
       Values Summary
-        Variables compared:            2
         Variables with Unequal values: 1
         Total Unequal values:          1
       
