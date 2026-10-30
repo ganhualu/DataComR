@@ -5,8 +5,8 @@ Authors@R:
     person("Ganhua", "Lu", , "ganhualu@gmail.com", role = c("aut", "cre"))
 Description: Compares a base dataset with a compare dataset following the
     semantics of SAS PROC COMPARE: ID variables, numeric comparison methods,
-    a PROC COMPARE-style listing and a SYSINFO-style return code. Aimed at
-    clinical and pharmaceutical validation.
+    a PROC COMPARE-style listing and a SYSINFO-style return code. Gives
+    users familiar with SAS PROC COMPARE a similar tool in R.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
