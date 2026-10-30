@@ -2,7 +2,7 @@ Package: DataComR
 Title: Compare Datasets the Way SAS PROC COMPARE Does
 Version: 0.0.0.9000
 Authors@R:
-    person("Ganhua", "Lu", , "ganhualu@gmail.com", role = c("aut", "cre"))
+    person("GH", "Lu", , "ganhualu@gmail.com", role = c("aut", "cre"))
 Description: Compares a base dataset with a compare dataset following the
     semantics of SAS PROC COMPARE: ID variables, numeric comparison methods,
     a PROC COMPARE-style listing and a SYSINFO-style return code. Gives
