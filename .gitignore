@@ -1,0 +1,21 @@
+# R session
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.Renviron
+
+# Build and check artifacts
+*.tar.gz
+*.Rcheck/
+src/*.o
+src/*.so
+src/*.dll
+
+# Rendered vignettes
+inst/doc
+/doc/
+/Meta/
+
+# OS / editor
+.DS_Store
