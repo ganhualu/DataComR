@@ -2,6 +2,7 @@
 print.df_compare <- function(x, ...) {
   cli::cat_rule("The COMPARE Procedure")
   cli::cat_line("Comparison of Base with Compare")
+  listing_dataset_summary(x)
   listing_variables_summary(x)
   listing_observation_summary(x)
   listing_values_summary(x)
@@ -10,6 +11,19 @@ print.df_compare <- function(x, ...) {
 }
 
 # Listing sections, in PROC COMPARE's order. Each starts with a blank line.
+
+# Shown only when either dataset has a label, the one dataset attribute
+# compared.
+listing_dataset_summary <- function(x) {
+  labels <- x$dataset_labels
+  if (all(is.na(labels))) {
+    return(invisible())
+  }
+  cli::cat_line()
+  cli::cat_line("Dataset Summary")
+  cli::cat_line("  Base label:    ", absent_as_none(labels[["base"]]))
+  cli::cat_line("  Compare label: ", absent_as_none(labels[["compare"]]))
+}
 
 listing_variables_summary <- function(x) {
   cli::cat_line()
@@ -25,6 +39,7 @@ listing_variables_summary <- function(x) {
     x$type_differences,
     "Variables with different types in the same Type family"
   )
+  listing_attribute_differences(x$attribute_differences)
 }
 
 listing_one_sided_variables <- function(variables, dataset, other) {
@@ -47,6 +62,35 @@ listing_type_lines <- function(types, heading) {
     "    ", types$variable, ": ", types$base_type, " in Base, ",
     types$compare_type, " in Compare"
   ))
+}
+
+listing_attribute_differences <- function(attribute_differences) {
+  if (nrow(attribute_differences) == 0) {
+    return(invisible())
+  }
+  cli::cat_line(
+    "  Variables with Attribute differences: ",
+    length(unique(attribute_differences$variable))
+  )
+  cli::cat_line()
+  cli::cat_line("  Attribute differences")
+  listing_table(list(
+    Variable = attribute_differences$variable,
+    Attribute = attribute_differences$attribute,
+    Base = absent_as_none(attribute_differences$base),
+    Compare = absent_as_none(attribute_differences$compare)
+  ))
+}
+
+# Prints named columns as a left-aligned table under their names.
+listing_table <- function(columns) {
+  padded <- Map(function(name, values) format(c(name, values)), names(columns), columns)
+  rows <- do.call(paste, c(unname(padded), sep = "  "))
+  cli::cat_line("    ", trimws(rows, which = "right"))
+}
+
+absent_as_none <- function(x) {
+  ifelse(is.na(x), "(none)", x)
 }
 
 listing_observation_summary <- function(x) {

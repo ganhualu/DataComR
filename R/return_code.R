@@ -29,7 +29,13 @@ return_code <- function(x) {
 # One logical per condition found, named after its RC_BITS entry.
 return_code_flags <- function(x) {
   unmatched <- unmatched_rows(x)
+  attribute <- x$attribute_differences$attribute
+  labels <- x$dataset_labels
   c(
+    dataset_label = attribute_differs(labels[["base"]], labels[["compare"]]),
+    format = "format" %in% attribute,
+    width = "width" %in% attribute,
+    label = "label" %in% attribute,
     base_obs = any(unmatched$dataset == "Base"),
     compare_obs = any(unmatched$dataset == "Compare"),
     base_var = length(x$base_only) > 0,

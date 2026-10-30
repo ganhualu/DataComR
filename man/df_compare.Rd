@@ -73,8 +73,30 @@ Two duckdb tables must share one connection. arrow, duckdb, dbplyr and DBI
 are optional; an informative error names any that an input needs but that
 is not installed.
 
-Attributes and special missings that a backend does not preserve (for
-example variable labels, SAS formats or haven tagged \code{NA}s in a duckdb
-table) are treated as absent for that dataset.
+Special missings that a backend does not preserve (for example haven
+tagged \code{NA}s in a duckdb table) are treated as absent for that dataset; for
+attributes, see the Attribute differences section.
+}
+
+\section{Attribute differences}{
+
+As PROC COMPARE does, \code{df_compare()} compares metadata as well as values.
+For each common variable, ID variables included, the \code{label}, \code{format.sas} and \code{width} attributes
+(as set by haven when reading SAS files) are compared, and so is the data
+frame's own \code{label} attribute (the dataset label). An attribute present on
+only one side is an Attribute difference; one absent on both sides is
+ignored. Attribute differences are shown in the Listing's Variables Summary
+(dataset labels in its Dataset Summary) and set Return code bits 1 (dataset
+label), 8 (format), 16 (width) and 32 (variable label). They are never
+Unequal values: they don't appear in \code{\link[=differences]{differences()}} and never set bit 4096.
+
+Attributes are R metadata, so they are only as complete as the backend
+keeps them. Data frames (including tibbles read with haven) keep them.
+Arrow data keeps the R attributes it was created with, stored in its
+metadata; arrow data written outside R has none, so it is treated as having
+no attributes. Lazy database tables, such as duckdb tables, carry no R
+attributes at all: when either dataset is one, no attributes are compared
+and no Attribute differences are reported, rather than reporting false
+ones.
 }
 
