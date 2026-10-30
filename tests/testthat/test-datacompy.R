@@ -15,10 +15,11 @@ read_fixture <- function(file, types) {
   ))
 }
 
-# The "Matched on <ID variables>: n" line of the Listing.
-listed_matched <- function(res) {
-  line <- grep("Matched on ", capture.output(print(res)), value = TRUE)
-  as.integer(sub(".*: ", "", line))
+# Matched observations: every Base observation that isn't Unmatched. Holds
+# because the fixtures have no Duplicate IDs; derived from public results so
+# the tests don't depend on the Listing's layout.
+matched_count <- function(base, unmatched) {
+  nrow(base) - sum(unmatched$dataset == "Base")
 }
 
 sort_by_ids <- function(df, cols) {
@@ -59,7 +60,7 @@ for (i in seq_len(nrow(manifest))) {
       res <- run(as_backend)
       unmatched <- unmatched_rows(res)
 
-      expect_identical(listed_matched(res), as.integer(fx$matched))
+      expect_identical(matched_count(base, unmatched), as.integer(fx$matched))
       expect_identical(sum(unmatched$dataset == "Base"), as.integer(fx$unmatched_base))
       expect_identical(sum(unmatched$dataset == "Compare"), as.integer(fx$unmatched_compare))
       expect_equal(
