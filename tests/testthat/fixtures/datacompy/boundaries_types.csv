@@ -1,0 +1,4 @@
+variable,type
+id,integer
+x,numeric
+y,numeric
