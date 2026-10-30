@@ -38,16 +38,24 @@ check_number <- function(x, what, min, max = Inf, call = rlang::caller_env(),
   }
 }
 
-# Compares every common variable of the matched observations and returns all
-# Unequal values as one long tibble.
+# Compares every common variable of the matched observations. Returns all
+# Unequal values as one long tibble (`differences`) and the number of values
+# judged equal under the Comparison method that are not exactly equal
+# (`not_exactly_equal`, always 0 for the exact method).
 compare_values <- function(matched, base, id, pairs, rules) {
-  unequal <- lapply(seq_along(pairs$common), function(i) {
+  results <- lapply(seq_along(pairs$common), function(i) {
     unequal_values(
       matched, id, pairs$common[[i]], pairs$base[[i]], pairs$compare[[i]],
       pairs$family[[i]], rules
     )
   })
-  dplyr::bind_rows(empty_differences(base, id), unequal)
+  list(
+    differences = dplyr::bind_rows(
+      empty_differences(base, id),
+      lapply(results, `[[`, "unequal")
+    ),
+    not_exactly_equal = sum(vapply(results, `[[`, integer(1), "not_exactly_equal"))
+  )
 }
 
 # Collects the Unequal values of one common variable. The filter runs in the
@@ -71,6 +79,9 @@ unequal_values <- function(matched, id, variable, base_var, compare_var, family,
       !!is_unequal | (!!b_missing & !!cmp_missing & (!!na_tags_differ)(!!b, !!cmp))
     )
   }
+  not_exactly_equal <- count_not_exactly_equal(
+    matched, b, cmp, b_missing, cmp_missing, is_unequal, family, rules
+  )
   unequal <- matched |>
     dplyr::filter(!!is_unequal) |>
     dplyr::select(dplyr::all_of(id), base = !!b, compare = !!cmp) |>
@@ -80,7 +91,7 @@ unequal_values <- function(matched, id, variable, base_var, compare_var, family,
   # diff and pct_diff are computed on the collected Unequal values only.
   diff <- if (numeric) as.double(unequal$compare) - as.double(unequal$base) else NA_real_
   pct_diff <- if (numeric) 100 * diff / as.double(unequal$base) else NA_real_
-  unequal |>
+  unequal <- unequal |>
     dplyr::mutate(
       variable = variable,
       base = format_value(.data$base, numeric),
@@ -90,6 +101,25 @@ unequal_values <- function(matched, id, variable, base_var, compare_var, family,
       .after = dplyr::all_of(id)
     ) |>
     tibble::as_tibble()
+  list(unequal = unequal, not_exactly_equal = not_exactly_equal)
+}
+
+# Values of a numeric variable judged equal by a non-exact Comparison method
+# although they differ, as SAS reports under "Total Number of Values not
+# EXACTLY Equal". Counted in the backend; only the count reaches R.
+count_not_exactly_equal <- function(matched, b, cmp, b_missing, cmp_missing,
+                                    is_unequal, family, rules) {
+  if (family != "numeric" || rules$method == "exact") {
+    return(0L)
+  }
+  counted <- matched |>
+    dplyr::filter(
+      !(!!b_missing) & !(!!cmp_missing) & !(!!is_unequal) &
+        as.numeric(!!b) != as.numeric(!!cmp)
+    ) |>
+    dplyr::summarise(n = dplyr::n()) |>
+    dplyr::collect()
+  as.integer(dplyr::pull(counted, "n"))
 }
 
 # Whether a value is missing, with NaN counted as missing. R and arrow's

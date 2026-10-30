@@ -14,7 +14,8 @@ df_compare(
   criterion = 1e-05,
   relative_delta = 0,
   ignore_trailing_blanks = TRUE,
-  ignore_case = FALSE
+  ignore_case = FALSE,
+  max_print = 50
 )
 }
 \arguments{
@@ -64,6 +65,10 @@ always count.}
 exactly, so \code{USUBJID} and \code{usubjid} are different variables. If \code{TRUE},
 names that differ only in case are paired; see the Variable pairing
 section.}
+
+\item{max_print}{The most Unequal values the Listing shows per variable,
+as SAS's \verb{MAXPRINT=}; the Listing notes when a variable has more.
+\code{\link[=differences]{differences()}} always returns all of them.}
 }
 \value{
 A \code{df_compare} object.

@@ -5,19 +5,50 @@
     Output
       -- The COMPARE Procedure -------------------------------------------------------
       Comparison of Base with Compare
+      (Method=EXACT)
+      
+      Data Set Summary
+      
+          Dataset  NVar  NObs  Label
+          Base        2     3
+          Compare     2     4
       
       Variables Summary
-        Variables compared: 2
+      
+        Number of Variables in Common: 2.
       
       Observation Summary
-        Observations in Base:    3
-        Observations in Compare: 4
-        Matched by position: 3
-        Observations in Compare but not in Base: 1
       
-      Values Summary
-        Variables with Unequal values: 1
-        Total Unequal values:          1
+        Observations are matched by position.
+        Number of Observations in Common: 3.
+        Number of Observations in Compare but not in Base: 1.
+        Total Number of Observations Read from Base: 3.
+        Total Number of Observations Read from Compare: 4.
+      
+        Number of Observations with Some Compared Variables Unequal: 1.
+        Number of Observations with All Compared Variables Equal: 2.
+      
+      Values Comparison Summary
+      
+        Number of Variables Compared with All Observations Equal: 1.
+        Number of Variables Compared with Some Observations Unequal: 1.
+        Total Number of Values which Compare Unequal: 1.
+        Maximum Difference: 1.
+      
+      Variables with Unequal Values
+      
+          Variable  Type     Ndif  MaxDif
+          aval      numeric     1       1
+      
+      Value Comparison Results for Variables
+      
+        _________________________________________________________
+                   ||       Base    Compare
+        obs        ||       aval       aval      Diff.     % Diff
+        _________  ||  _________  _________  _________  _________
+                   ||
+        2          ||         20         21          1          5
+        _________________________________________________________
       
       Return code: 4224
 
