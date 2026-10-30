@@ -21,13 +21,16 @@ df_compare <- function(base, compare, id, method = "exact", criterion = 1e-5,
 
   common <- setdiff(intersect(colnames(base), colnames(compare)), id)
   types <- variable_types(base, compare, common)
-  pairs <- variable_pairs(common, types$base_family)
+  compared <- types[types$base_family == types$compare_family, ]
+  pairs <- variable_pairs(compared$variable, compared$base_family)
   matched <- match_observations(base, compare, id, pairs)
 
   new_df_compare(
     differences = compare_values(matched, base, id, pairs, rules),
+    conflicting_types = conflicting_types(types),
+    type_differences = type_differences(types),
     id = id,
-    compared = common,
+    compared = compared$variable,
     n_obs = c(
       base = count_obs(base),
       compare = count_obs(compare),

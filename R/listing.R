@@ -15,6 +15,27 @@ listing_variables_summary <- function(x) {
   cli::cat_line()
   cli::cat_line("Variables Summary")
   cli::cat_line("  Variables compared: ", length(x$compared))
+  listing_type_lines(
+    x$conflicting_types,
+    "Variables with Conflicting types"
+  )
+  listing_type_lines(
+    x$type_differences,
+    "Variables with different types in the same Type family"
+  )
+}
+
+# One line per variable, showing its type in each dataset. Nothing is shown
+# when there are no such variables.
+listing_type_lines <- function(types, heading) {
+  if (is.null(types) || nrow(types) == 0) {
+    return(invisible())
+  }
+  cli::cat_line("  ", heading, ": ", nrow(types))
+  cli::cat_line(paste0(
+    "    ", types$variable, ": ", types$base_type, " in Base, ",
+    types$compare_type, " in Compare"
+  ))
 }
 
 listing_observation_summary <- function(x) {

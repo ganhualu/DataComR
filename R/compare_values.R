@@ -45,9 +45,10 @@ compare_values <- function(matched, base, id, pairs, rules) {
 unequal_values <- function(matched, id, variable, base_var, compare_var, family, rules) {
   b <- rlang::sym(base_var)
   cmp <- rlang::sym(compare_var)
+  in_memory <- is.data.frame(matched)
   is_unequal <- rlang::expr(
     (is.na(!!b) != is.na(!!cmp)) |
-      (!is.na(!!b) & !is.na(!!cmp) & !!numeric_unequal(b, cmp, rules))
+      (!is.na(!!b) & !is.na(!!cmp) & !!values_unequal(b, cmp, family, rules, in_memory))
   )
   unequal <- matched |>
     dplyr::filter(!!is_unequal) |>
@@ -68,6 +69,29 @@ unequal_values <- function(matched, id, variable, base_var, compare_var, family,
       .after = dplyr::all_of(id)
     ) |>
     tibble::as_tibble()
+}
+
+# The test for two non-missing values of one Type family, as an expression
+# the backend can evaluate. Only the numeric family uses the Comparison
+# method; dates are compared exactly and datetimes as instants (the stored
+# number of seconds, whatever the time zone).
+values_unequal <- function(x, y, family, rules, in_memory) {
+  if (family == "datetime" && in_memory) {
+    # R-only: comparing POSIXct with different time zones warns, although it
+    # already compares instants. Backends store instants and compare them
+    # directly, and have no translation for unclass().
+    return(rlang::expr(unclass(!!x) != unclass(!!y)))
+  }
+  switch(family,
+    # One storage type for both sides, so integer, double and logical compare
+    # by value.
+    numeric = numeric_unequal(
+      rlang::expr(as.numeric(!!x)), rlang::expr(as.numeric(!!y)), rules
+    ),
+    # Factors compare by label, whatever their levels.
+    character = rlang::expr(as.character(!!x) != as.character(!!y)),
+    rlang::expr(!!x != !!y)
+  )
 }
 
 # SAS PROC COMPARE's test for two non-missing numeric values, x in Base and

@@ -15,6 +15,25 @@ variable_types <- function(base, compare, common) {
   )
 }
 
+# Common variables whose versions belong to different Type families: listed
+# with type and family on each side, and never value-compared.
+conflicting_types <- function(types) {
+  conflicting <- types[types$base_family != types$compare_family, ]
+  tibble::tibble(
+    variable = conflicting$variable,
+    base_type = paste0(conflicting$base_type, " (", conflicting$base_family, ")"),
+    compare_type = paste0(conflicting$compare_type, " (", conflicting$compare_family, ")")
+  )
+}
+
+# Common variables of one Type family stored as different types (e.g.
+# integer and double): compared as usual, listed for information only.
+type_differences <- function(types) {
+  differ <- types[types$base_family == types$compare_family &
+    types$base_type != types$compare_type, ]
+  differ[c("variable", "base_type", "compare_type")]
+}
+
 prototype <- function(data) {
   dplyr::collect(utils::head(data, 0))
 }

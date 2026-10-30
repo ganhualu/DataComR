@@ -113,6 +113,147 @@ test_each_backend("differences() gives diff and pct_diff for numeric Unequal val
   )
 })
 
+test_each_backend("integer, double and logical are one Type family, compared by value", {
+  base <- data.frame(id = 1:3, n = c(1L, 2L, 3L), flag = c(TRUE, FALSE, TRUE))
+  compare <- data.frame(id = 1:3, n = c(1, 2, 3.5), flag = c(1, 0, 1))
+
+  res <- df_compare(as_backend(base), as_backend(compare), id = "id")
+
+  expect_identical(return_code(res), 4096L)
+  expect_identical(
+    differences(res),
+    tibble::tibble(
+      id = 3L, variable = "n", base = "3", compare = "3.5",
+      diff = 0.5, pct_diff = 100 / 6
+    )
+  )
+})
+
+test_each_backend("factor and character are one Type family, compared by labels", {
+  base <- data.frame(
+    id = 1:3,
+    s = factor(c("a", "b", "c"), levels = c("c", "b", "a")),
+    f = factor(c("x", "y", "y"))
+  )
+  compare <- data.frame(
+    id = 1:3,
+    s = c("a", "b", "z"),
+    f = factor(c("x", "y", "w"), levels = c("y", "x", "w"))
+  )
+
+  res <- df_compare(as_backend(base), as_backend(compare), id = "id")
+
+  # Level order and level sets play no part, only the labels.
+  expect_identical(
+    differences(res)[c("id", "variable", "base", "compare")],
+    tibble::tibble(id = c(3L, 3L), variable = c("s", "f"), base = c("c", "y"), compare = c("z", "w"))
+  )
+})
+
+test_each_backend("a type difference within a Type family is listed but sets no bit", {
+  base <- data.frame(id = 1:2, n = c(1L, 2L), s = factor(c("a", "b")), x = c(1, 2))
+  compare <- data.frame(id = 1:2, n = c(1, 2), s = c("a", "b"), x = c(1, 2))
+
+  res <- df_compare(as_backend(base), as_backend(compare), id = "id")
+
+  expect_identical(return_code(res), 0L)
+  expect_snapshot(print(res))
+})
+
+test_each_backend("numeric against character is Conflicting types: listed, bit 8192, not value-compared", {
+  base <- data.frame(id = 1:2, x = c(1, 2), y = c(1, 2))
+  compare <- data.frame(id = 1:2, x = c("1", "z"), y = c(1, 3))
+
+  res <- df_compare(as_backend(base), as_backend(compare), id = "id")
+
+  # 8192 Conflicting types + 4096 for the Unequal value of y
+  expect_identical(return_code(res), 8192L + 4096L)
+  expect_identical(unique(differences(res)$variable), "y")
+  expect_snapshot(print(res))
+})
+
+test_each_backend("date, datetime, numeric and character are four Type families", {
+  day <- as.Date("2024-01-01")
+  instant <- as.POSIXct("2024-01-01 00:00:00", tz = "UTC")
+  base <- data.frame(id = 1, a = day, b = instant, c = day, d = instant)
+  compare <- data.frame(id = 1, a = instant, b = 1, c = "2024-01-01", d = day)
+
+  res <- df_compare(as_backend(base), as_backend(compare), id = "id")
+
+  expect_identical(return_code(res), 8192L)
+  expect_identical(nrow(differences(res)), 0L)
+  expect_snapshot(print(res))
+})
+
+test_each_backend("dates one day apart are unequal under every Comparison method", {
+  base <- data.frame(id = 1:2, d = as.Date(c("2024-01-01", "2024-03-01")))
+  compare <- data.frame(id = 1:2, d = as.Date(c("2024-01-02", "2024-03-01")))
+
+  for (method in c("exact", "absolute", "relative", "percent")) {
+    res <- df_compare(
+      as_backend(base), as_backend(compare), id = "id",
+      method = method, criterion = 1000
+    )
+    expect_identical(
+      differences(res),
+      tibble::tibble(
+        id = 1L, variable = "d", base = "2024-01-01", compare = "2024-01-02",
+        diff = NA_real_, pct_diff = NA_real_
+      )
+    )
+  }
+})
+
+test_each_backend("datetimes are compared as instants, whatever their time zone", {
+  utc <- as.POSIXct(c("2024-01-01 12:00:00", "2024-01-01 12:00:00"), tz = "UTC")
+  base <- data.frame(id = 1:2, t = utc)
+  compare <- data.frame(id = 1:2, t = utc + c(0, 1))
+  attr(compare$t, "tzone") <- "America/New_York"
+
+  res <- df_compare(
+    as_backend(base), as_backend(compare), id = "id",
+    method = "absolute", criterion = 5
+  )
+
+  # 12:00 UTC is 07:00 in New York: the same instant. One second later is
+  # unequal even though the Criterion is 5.
+  expect_identical(differences(res)$id, 2L)
+  expect_identical(differences(res)$diff, NA_real_)
+})
+
+test_each_backend("NaN is a missing value: equal to NA, unequal to a number", {
+  base <- data.frame(id = 1:3, x = c(NaN, NaN, NA))
+  compare <- data.frame(id = 1:3, x = c(NA, 1, NaN))
+
+  res <- df_compare(as_backend(base), as_backend(compare), id = "id")
+
+  expect_identical(differences(res)$id, 2L)
+  expect_identical(differences(res)$base, NA_character_)
+})
+
+# haven's tagged NAs live in the payload bits of a double NA, which arrow and
+# duckdb do not keep, so these rules are tested on data frames only.
+test_that("special missings are equal only when they carry the same letter", {
+  skip_if_not_installed("haven")
+  na_a <- haven::tagged_na("a")
+  na_b <- haven::tagged_na("b")
+  base <- data.frame(id = 1:5, x = c(na_a, na_a, na_a, NA, 1))
+  compare <- data.frame(id = 1:5, x = c(na_a, na_b, NA, NaN, na_a))
+
+  res <- df_compare(base, compare, id = "id")
+
+  # .A = .A; .A != .B; .A != . ; . = NaN; 1 != .A
+  expect_identical(return_code(res), 4096L)
+  expect_identical(
+    differences(res),
+    tibble::tibble(
+      id = c(2L, 3L, 5L), variable = "x",
+      base = c("NA(a)", "NA(a)", "1"), compare = c("NA(b)", NA, "NA(a)"),
+      diff = NA_real_, pct_diff = NA_real_
+    )
+  )
+})
+
 test_each_backend("an unknown Comparison method is an error", {
   df <- data.frame(id = 1, x = 1)
 
