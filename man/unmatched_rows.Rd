@@ -12,7 +12,9 @@ unmatched_rows(x)
 \value{
 A tibble with the ID variables of each Unmatched observation and a
 \code{dataset} column, \code{"Base"} or \code{"Compare"}, naming the only dataset it is
-in. Sorted by \code{dataset}, then by ID variables.
+in. Sorted by \code{dataset}, then by ID variables. ID values that are a
+Duplicate ID in either dataset are never Unmatched observations; the
+Listing reports them as Duplicate IDs instead.
 }
 \description{
 Unmatched observations found by a comparison

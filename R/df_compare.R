@@ -14,10 +14,12 @@ df_compare <- function(base, compare, id) {
   pairs <- variable_pairs(common)
   observations <- match_observations(base, compare, id, pairs)
   matched <- observations$matched
+  warn_duplicate_ids(observations$duplicates)
 
   new_df_compare(
     differences = compare_values(matched, base, id, pairs),
     unmatched = observations$unmatched,
+    duplicates = observations$duplicates,
     id = id,
     compared = common,
     base_only = setdiff(colnames(base), colnames(compare)),
@@ -60,7 +62,9 @@ differences <- function(x) {
 #' @param x A `df_compare` object.
 #' @return A tibble with the ID variables of each Unmatched observation and a
 #'   `dataset` column, `"Base"` or `"Compare"`, naming the only dataset it is
-#'   in. Sorted by `dataset`, then by ID variables.
+#'   in. Sorted by `dataset`, then by ID variables. ID values that are a
+#'   Duplicate ID in either dataset are never Unmatched observations; the
+#'   Listing reports them as Duplicate IDs instead.
 #' @export
 unmatched_rows <- function(x) {
   x$unmatched

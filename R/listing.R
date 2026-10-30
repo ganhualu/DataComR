@@ -38,6 +38,22 @@ listing_observation_summary <- function(x) {
   unmatched <- unmatched_rows(x)
   listing_unmatched_count(sum(unmatched$dataset == "Base"), "Base", "Compare")
   listing_unmatched_count(sum(unmatched$dataset == "Compare"), "Compare", "Base")
+  listing_duplicate_ids(x$duplicates, x$id)
+}
+
+# One line per Duplicate ID: the dataset, its ID values and how many
+# observations share them.
+listing_duplicate_ids <- function(duplicates, id) {
+  if (nrow(duplicates) == 0) {
+    return(invisible())
+  }
+  id_values <- lapply(id, function(v) paste0(v, "=", format_value(duplicates[[v]])))
+  id_values <- do.call(paste, c(id_values, sep = ", "))
+  cli::cat_line("  Duplicate IDs (not compared): ", nrow(duplicates))
+  cli::cat_line(
+    "    ", format(duplicates$dataset), "  ", id_values,
+    " (", duplicates$.n, " observations)"
+  )
 }
 
 # Like PROC COMPARE, a line only for datasets that have Unmatched observations.
