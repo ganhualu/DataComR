@@ -2,8 +2,9 @@
 # Matched observations (still in the backend), the collected Unmatched
 # observations and the collected Duplicate IDs. An ID value that is a
 # Duplicate ID in either dataset is set aside in both before pairing, so it
-# is neither a Matched nor an Unmatched observation.
-match_observations <- function(base, compare, id, pairs) {
+# is neither a Matched nor an Unmatched observation. `compare_id` names the
+# ID variables in Compare; they are renamed to their Base names (`id`).
+match_observations <- function(base, compare, id, pairs, compare_id = id) {
   base <- dplyr::select(
     base,
     dplyr::all_of(id),
@@ -11,8 +12,8 @@ match_observations <- function(base, compare, id, pairs) {
   )
   compare <- dplyr::select(
     compare,
-    dplyr::all_of(id),
-    !!!rlang::set_names(rlang::syms(pairs$common), pairs$compare)
+    !!!rlang::set_names(rlang::syms(compare_id), id),
+    !!!rlang::set_names(rlang::syms(pairs$compare_source), pairs$compare)
   )
   base_dups <- duplicate_ids(base, id)
   compare_dups <- duplicate_ids(compare, id)

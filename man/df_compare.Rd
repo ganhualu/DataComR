@@ -8,10 +8,13 @@ df_compare(
   base,
   compare,
   id,
+  var = NULL,
+  with = NULL,
   method = "exact",
   criterion = 1e-05,
   relative_delta = 0,
-  ignore_trailing_blanks = TRUE
+  ignore_trailing_blanks = TRUE,
+  ignore_case = FALSE
 )
 }
 \arguments{
@@ -23,6 +26,17 @@ table (a dbplyr lazy table on a duckdb connection).}
 types accepted for \code{base}, in any combination with it.}
 
 \item{id}{Character vector of ID variables used to pair observations.}
+
+\item{var}{Character vector of Base variables whose values are compared,
+as SAS's \code{VAR} statement; \code{NULL} (the default) compares every common
+variable. Each must be in both datasets, unless \code{with} names its Compare
+variable. \code{var} and \code{with} must not name ID variables, whose values
+are equal in every Matched observation by construction. See the Variable pairing
+section.}
+
+\item{with}{Character vector of Compare variables, as SAS's \code{WITH}
+statement: the same length as \code{var}, each paired by position with the
+\code{var} variable it is compared with. Results report the Base name.}
 
 \item{method}{The Comparison method for numeric variables: \code{"exact"},
 \code{"absolute"}, \code{"relative"} or \code{"percent"}, as SAS's \verb{METHOD=}.}
@@ -37,6 +51,11 @@ denominator, as in SAS's \code{METHOD=RELATIVE(δ)}: a number between 0 and 1,
 \item{ignore_trailing_blanks}{If \code{TRUE} (the default), character values
 that differ only in trailing blanks are equal, as in SAS. Leading blanks
 always count.}
+
+\item{ignore_case}{If \code{FALSE} (the default), variable names are matched
+exactly, so \code{USUBJID} and \code{usubjid} are different variables. If \code{TRUE},
+names that differ only in case are paired; see the Variable pairing
+section.}
 }
 \value{
 A \code{df_compare} object.
@@ -55,6 +74,25 @@ Two missing values are equal and \code{NaN} counts as missing. Special missings
 letter; this rule needs in-memory data frames, since arrow and duckdb do
 not keep the tags.
 }
+\section{Variable pairing}{
+
+A Base variable is paired with the Compare variable of the same name. Names
+are case-sensitive by default, unlike in SAS, so that \code{a} and \code{A} are never
+silently treated as one variable. With \code{ignore_case = TRUE}, names that
+differ only in case are paired instead, and \code{id}, \code{var} and \code{with} may be
+written in either dataset's case; results and the Listing always use the
+Base names. It is an error when two names in one dataset differ only in
+case, since the pairing would then be ambiguous.
+
+As with SAS's \code{VAR} statement, \code{var} restricts only the comparison of
+values: Unequal values are reported for the \code{var} variables alone, while
+the Variables Summary (variables in only one dataset, Conflicting types,
+Attribute differences) still covers every variable, and so does the Return
+code. A Base variable paired by \code{with} is not a variable in only one
+dataset, and neither is its Compare variable; its Attribute differences are
+reported under the Base name.
+}
+
 \section{Backends}{
 
 The comparison runs as dplyr verbs inside the datasets' own backend; only
@@ -81,8 +119,9 @@ attributes, see the Attribute differences section.
 \section{Attribute differences}{
 
 As PROC COMPARE does, \code{df_compare()} compares metadata as well as values.
-For each common variable, ID variables included, the \code{label}, \code{format.sas} and \code{width} attributes
-(as set by haven when reading SAS files) are compared, and so is the data
+For each common variable and each \code{with} pair, ID variables included, the
+\code{label}, \code{format.sas} and \code{width} attributes (as set by haven when reading
+SAS files) are compared, and so is the data
 frame's own \code{label} attribute (the dataset label). An attribute present on
 only one side is an Attribute difference; one absent on both sides is
 ignored. Attribute differences are shown in the Listing's Variables Summary

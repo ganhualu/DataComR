@@ -18,6 +18,15 @@
 #' @param compare The Compare dataset, checked against `base`. Any of the
 #'   types accepted for `base`, in any combination with it.
 #' @param id Character vector of ID variables used to pair observations.
+#' @param var Character vector of Base variables whose values are compared,
+#'   as SAS's `VAR` statement; `NULL` (the default) compares every common
+#'   variable. Each must be in both datasets, unless `with` names its Compare
+#'   variable. `var` and `with` must not name ID variables, whose values
+#'   are equal in every Matched observation by construction. See the Variable pairing
+#'   section.
+#' @param with Character vector of Compare variables, as SAS's `WITH`
+#'   statement: the same length as `var`, each paired by position with the
+#'   `var` variable it is compared with. Results report the Base name.
 #' @param method The Comparison method for numeric variables: `"exact"`,
 #'   `"absolute"`, `"relative"` or `"percent"`, as SAS's `METHOD=`.
 #' @param criterion The Criterion the method tests differences against, as
@@ -28,7 +37,28 @@
 #' @param ignore_trailing_blanks If `TRUE` (the default), character values
 #'   that differ only in trailing blanks are equal, as in SAS. Leading blanks
 #'   always count.
+#' @param ignore_case If `FALSE` (the default), variable names are matched
+#'   exactly, so `USUBJID` and `usubjid` are different variables. If `TRUE`,
+#'   names that differ only in case are paired; see the Variable pairing
+#'   section.
 #' @return A `df_compare` object.
+#'
+#' @section Variable pairing:
+#' A Base variable is paired with the Compare variable of the same name. Names
+#' are case-sensitive by default, unlike in SAS, so that `a` and `A` are never
+#' silently treated as one variable. With `ignore_case = TRUE`, names that
+#' differ only in case are paired instead, and `id`, `var` and `with` may be
+#' written in either dataset's case; results and the Listing always use the
+#' Base names. It is an error when two names in one dataset differ only in
+#' case, since the pairing would then be ambiguous.
+#'
+#' As with SAS's `VAR` statement, `var` restricts only the comparison of
+#' values: Unequal values are reported for the `var` variables alone, while
+#' the Variables Summary (variables in only one dataset, Conflicting types,
+#' Attribute differences) still covers every variable, and so does the Return
+#' code. A Base variable paired by `with` is not a variable in only one
+#' dataset, and neither is its Compare variable; its Attribute differences are
+#' reported under the Base name.
 #'
 #' @section Backends:
 #' The comparison runs as dplyr verbs inside the datasets' own backend; only
@@ -52,8 +82,9 @@
 #'
 #' @section Attribute differences:
 #' As PROC COMPARE does, `df_compare()` compares metadata as well as values.
-#' For each common variable, ID variables included, the `label`, `format.sas` and `width` attributes
-#' (as set by haven when reading SAS files) are compared, and so is the data
+#' For each common variable and each `with` pair, ID variables included, the
+#' `label`, `format.sas` and `width` attributes (as set by haven when reading
+#' SAS files) are compared, and so is the data
 #' frame's own `label` attribute (the dataset label). An attribute present on
 #' only one side is an Attribute difference; one absent on both sides is
 #' ignored. Attribute differences are shown in the Listing's Variables Summary
@@ -70,8 +101,10 @@
 #' and no Attribute differences are reported, rather than reporting false
 #' ones.
 #' @export
-df_compare <- function(base, compare, id, method = "exact", criterion = 1e-5,
-                       relative_delta = 0, ignore_trailing_blanks = TRUE) {
+df_compare <- function(base, compare, id, var = NULL, with = NULL,
+                       method = "exact", criterion = 1e-5,
+                       relative_delta = 0, ignore_trailing_blanks = TRUE,
+                       ignore_case = FALSE) {
   check_id(id)
   # Attributes are read from the datasets as given, before one_backend() may
   # move one of them into another backend that drops R attributes.
@@ -80,19 +113,25 @@ df_compare <- function(base, compare, id, method = "exact", criterion = 1e-5,
   on.exit(inputs$cleanup(), add = TRUE)
   base <- inputs$base
   compare <- inputs$compare
-  check_id_present(id, colnames(base), "Base")
-  check_id_present(id, colnames(compare), "Compare")
+  variables <- pair_variables(
+    colnames(base), colnames(compare), id, var, with, ignore_case
+  )
+  # From here on, ID variables go by their Base names.
+  id <- variables$id
   rules <- comparison_rules(method, criterion, relative_delta, ignore_trailing_blanks)
 
-  common <- setdiff(intersect(colnames(base), colnames(compare)), id)
-  types <- variable_types(base, compare, common)
-  compared <- types[types$base_family == types$compare_family, ]
-  pairs <- variable_pairs(compared$variable, compared$base_family)
-  observations <- match_observations(base, compare, id, pairs)
+  not_id <- !variables$base %in% id
+  types <- variable_types(
+    base, compare, variables$base[not_id], variables$compare[not_id]
+  )
+  compared <- types[types$base_family == types$compare_family &
+    types$variable %in% variables$compared, ]
+  pairs <- variable_pairs(compared$variable, compared$compare_variable, compared$base_family)
+  observations <- match_observations(base, compare, id, pairs, variables$compare_id)
   matched <- observations$matched
   warn_duplicate_ids(observations$duplicates)
   attribute_results <- compare_attributes(
-    original$base, original$compare, intersect(colnames(base), colnames(compare))
+    original$base, original$compare, variables$base, variables$compare
   )
 
   new_df_compare(
@@ -103,8 +142,8 @@ df_compare <- function(base, compare, id, method = "exact", criterion = 1e-5,
     type_differences = type_differences(types),
     id = id,
     compared = compared$variable,
-    base_only = setdiff(colnames(base), colnames(compare)),
-    compare_only = setdiff(colnames(compare), colnames(base)),
+    base_only = variables$base_only,
+    compare_only = variables$compare_only,
     dataset_labels = attribute_results$dataset_labels,
     attribute_differences = attribute_results$attribute_differences,
     n_obs = c(
@@ -115,12 +154,14 @@ df_compare <- function(base, compare, id, method = "exact", criterion = 1e-5,
   )
 }
 
-# Internal names for each common variable's Base and Compare versions after
+# Internal names for each compared variable's Base and Compare versions after
 # the join (.base_1, .compare_1, ...), so original names can never collide,
-# with the Type family both versions share.
-variable_pairs <- function(common, family) {
+# with the Compare variable it is paired with and the Type family both
+# versions share. `common` holds the Base names, which results report.
+variable_pairs <- function(common, compare_source, family) {
   list(
     common = common,
+    compare_source = compare_source,
     base = paste0(".base_", seq_along(common)),
     compare = paste0(".compare_", seq_along(common)),
     family = family
