@@ -1,0 +1,9 @@
+usubjid,visit,aval,avalc,flag
+01,1.0,10.0,low,Y
+01,2.0,11.75,High,Y
+02,1.0,20.0, low,N
+02,3.0,5.0,low,Y
+03,1.0,NA,NA,N
+06,1.0,60.0,mid,N
+05,1.0,NA,NA,Y
+07,2.0,70.0,y,N
