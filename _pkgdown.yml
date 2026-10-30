@@ -1,0 +1,15 @@
+url: https://ganhualu.github.io/DataComR/
+template:
+  bootstrap: 5
+
+reference:
+  - title: Compare datasets
+    desc: Compare a Base dataset with a Compare dataset, as PROC COMPARE does.
+    contents:
+      - df_compare
+  - title: Results
+    desc: Read a comparison's Unequal values, Unmatched observations and Return code.
+    contents:
+      - differences
+      - unmatched_rows
+      - return_code
