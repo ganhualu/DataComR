@@ -236,3 +236,20 @@ test_each_backend("names differing only in case within one dataset are distinct 
 
   expect_identical(differences(res)$variable, "AVAL")
 })
+
+test_that("var, with and ignore_case work when matching by position", {
+  base <- data.frame(A = 1:3, B = c("x", "y", "z"), C = c(1, 2, 3))
+  compare <- data.frame(a = c(1L, 9L), b2 = c("x", "q"), c = c(1, 2))
+
+  res <- df_compare(base, compare, var = c("A", "B"), with = c("a", "b2"), ignore_case = TRUE)
+
+  expect_identical(return_code(res), 4096L + 64L)
+  expect_identical(
+    differences(res),
+    tibble::tibble(
+      obs = c(2L, 2L), variable = c("A", "B"), base = c("2", "y"), compare = c("9", "q"),
+      diff = c(7, NA), pct_diff = c(350, NA)
+    )
+  )
+  expect_identical(unmatched_rows(res), tibble::tibble(obs = 3L, dataset = "Base"))
+})

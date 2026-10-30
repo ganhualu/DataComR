@@ -7,7 +7,7 @@
 df_compare(
   base,
   compare,
-  id,
+  id = NULL,
   var = NULL,
   with = NULL,
   method = "exact",
@@ -25,7 +25,15 @@ table (a dbplyr lazy table on a duckdb connection).}
 \item{compare}{The Compare dataset, checked against \code{base}. Any of the
 types accepted for \code{base}, in any combination with it.}
 
-\item{id}{Character vector of ID variables used to pair observations.}
+\item{id}{Character vector of ID variables used to pair observations, or
+\code{NULL} (the default) to match observations by position, as SAS does
+without an \code{ID} statement: the first Base observation with the first
+Compare observation, and so on. The extra observations of the longer
+dataset are then Unmatched observations, and \code{\link[=differences]{differences()}} and
+\code{\link[=unmatched_rows]{unmatched_rows()}} identify observations by an \code{obs} column holding the
+observation number. Matching by position needs in-memory data frames,
+since the observation order of arrow and duckdb data is not guaranteed;
+for those, \code{id} is required.}
 
 \item{var}{Character vector of Base variables whose values are compared,
 as SAS's \code{VAR} statement; \code{NULL} (the default) compares every common
