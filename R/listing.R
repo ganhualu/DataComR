@@ -1,7 +1,7 @@
 #' @export
 print.df_compare <- function(x, ...) {
   n_obs <- x$n_obs
-  diffs <- x$differences
+  unequal <- differences(x)
   cli::cat_rule("The COMPARE Procedure")
   cli::cat_line("Comparison of Base with Compare")
   cli::cat_line()
@@ -12,9 +12,9 @@ print.df_compare <- function(x, ...) {
   cli::cat_line()
   cli::cat_line("Values Summary")
   cli::cat_line("  Variables compared:            ", length(x$compared))
-  cli::cat_line("  Variables with Unequal values: ", length(unique(diffs$variable)))
-  cli::cat_line("  Total Unequal values:          ", nrow(diffs))
-  if (nrow(diffs) == 0) {
+  cli::cat_line("  Variables with Unequal values: ", length(unique(unequal$variable)))
+  cli::cat_line("  Total Unequal values:          ", nrow(unequal))
+  if (nrow(unequal) == 0) {
     cli::cat_line()
     cli::cat_line("NOTE: No unequal values were found. All values compared are exactly equal.")
   }

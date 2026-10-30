@@ -15,7 +15,6 @@ Imports:
     cli,
     dplyr,
     rlang,
-    stats,
     tibble,
     utils
 Suggests:

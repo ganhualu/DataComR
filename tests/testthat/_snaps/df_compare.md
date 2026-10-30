@@ -53,3 +53,19 @@
       
       Return code: 4096
 
+# id must name at least one ID variable [data_frame]
+
+    Code
+      df_compare(as_backend(base), as_backend(base), id = character())
+    Condition
+      Error in `df_compare()`:
+      ! `id` must be a character vector naming at least one ID variable.
+
+---
+
+    Code
+      df_compare(as_backend(base), as_backend(base), id = 1)
+    Condition
+      Error in `df_compare()`:
+      ! `id` must be a character vector naming at least one ID variable.
+

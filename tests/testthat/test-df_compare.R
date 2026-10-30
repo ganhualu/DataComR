@@ -81,3 +81,18 @@ test_each_backend("printing shows a minimal Listing", {
     df_compare(as_backend(base), as_backend(compare), id = c("usubjid", "visit"))
   })
 })
+
+test_each_backend("Unequal numeric values are shown at full precision", {
+  base_fp <- data.frame(id = 1, x = 0.1 + 0.2)
+  compare <- data.frame(id = 1, x = 0.3)
+
+  comparison <- df_compare(as_backend(base_fp), as_backend(compare), id = "id")
+
+  expect_identical(differences(comparison)$base, "0.30000000000000004")
+  expect_identical(differences(comparison)$compare, "0.3")
+})
+
+test_each_backend("id must name at least one ID variable", {
+  expect_snapshot(df_compare(as_backend(base), as_backend(base), id = character()), error = TRUE)
+  expect_snapshot(df_compare(as_backend(base), as_backend(base), id = 1), error = TRUE)
+})
